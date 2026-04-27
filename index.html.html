@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar ROI Calculator | PM Surya Ghar Subsidy 2026</title>
+    <meta name="description" content="Calculate your Solar ROI, system cost, and PM Surya Ghar Muft Bijli Yojana Central & State subsidies in India.">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* --- Base Variables & Resets --- */
+        :root {
+            --primary-color: #0b3d91;
+            --secondary-color: #2e8b57;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --whatsapp-green: #25D366;
+            --whatsapp-hover: #128C7E;
+            --pdf-red: #d9534f;
+            --pdf-hover: #c9302c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Navbar --- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background-color: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: color 0.3s ease; cursor: pointer; }
+        .nav-links a:hover { color: var(--primary-color); }
+
+        /* --- Hero & Calculator Area --- */
+        .hero-section { padding: 60px 0; background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); }
+        .glass-panel {
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .calculator-card h1 { text-align: center; color: var(--primary-color); margin-bottom: 10px; }
+        .subtitle { text-align: center; margin-bottom: 30px; color: #555; }
+        
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        select, input[type="number"], input[type="text"], input[type="tel"] { 
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; 
+        }
+        .slider-container { display: flex; align-items: center; gap: 15px; }
+        input[type="range"] { flex-grow: 1; cursor: pointer; }
+        input[type="number"].slider-input { width: 120px; }
+
+        /* Radio Group (Battery Toggle) */
+        .radio-group { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 5px; }
+        .radio-group label { font-weight: normal; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
+        /* Warnings */
+        .capacity-warning { color: #d9534f; font-size: 0.9rem; font-weight: 600; margin-top: 10px; display: none; }
+        .capacity-warning.visible { display: block; text-align: center; }
+        .capacity-warning.inline-visible { display: block; }
+
+        /* --- Results Grid --- */
+        .results-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;
+        }
+        .result-box {
+            background: var(--white); padding: 15px; border-radius: 8px; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center;
+        }
+        .result-box h3 { font-size: 0.9rem; color: #666; margin-bottom: 5px; }
+        .result-box p { font-size: 1.2rem; font-weight: bold; color: var(--text-color); }
+        .result-box.highlight p { color: var(--secondary-color); }
+        .result-box.focus p { color: var(--primary-color); font-size: 1.4rem; }
+        .result-box.focus-green p { color: var(--secondary-color); font-size: 1.4rem; }
+
+        /* Subsidy & EMI Subtext */
+        .subsidy-subtext { font-size: 0.75rem; color: #777; font-weight: normal; margin-top: 5px; }
+        .emi-indicator { font-size: 0.8rem; margin-top: 5px; font-weight: 600; }
+        .emi-indicator.green { color: var(--secondary-color); }
+        .emi-indicator.red { color: #d9534f; }
+
+        /* Chart Container */
+        .chart-container { position: relative; width: 100%; height: 300px; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+
+        /* Action Buttons */
+        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
+        .btn-action {
+            color: var(--white); padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; 
+            display: inline-flex; align-items: center; gap: 10px; font-size: 1.1rem; transition: transform 0.2s, background-color 0.3s;
+            border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-whatsapp { background-color: var(--whatsapp-green); }
+        .btn-whatsapp:hover { background-color: var(--whatsapp-hover); transform: translateY(-2px); }
+        .btn-pdf { background-color: var(--pdf-red); }
+        .btn-pdf:hover { background-color: var(--pdf-hover); transform: translateY(-2px); }
+
+        /* Lead Gen Form */
+        .lead-gen-card {
+            background: var(--white); border-radius: 12px; padding: 30px; margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; border-top: 4px solid var(--primary-color);
+        }
+        .lead-gen-card h2 { color: var(--primary-color); margin-bottom: 10px; font-size: 1.5rem; }
+        .lead-gen-card p { color: #666; margin-bottom: 20px; font-size: 0.95rem; }
+        .btn-submit { background-color: var(--primary-color); color: var(--white); width: 100%; max-width: 300px; margin: 0 auto; }
+
+        /* --- PDF Rendering Fix --- */
+        .pdf-mode-active {
+            background: #ffffff !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            box-shadow: none !important;
+            border: 1px solid #ccc !important;
+        }
+
+        /* --- AdSense Placeholders --- */
+        .ad-banner-placeholder {
+            width: 100%; max-width: 728px; height: 90px; margin: 40px auto; background-color: #eaeaea;
+            display: flex; justify-content: center; align-items: center; color: #999; font-size: 0.8rem; border: 1px dashed #ccc;
+        }
+
+        /* --- SEO Article --- */
+        .seo-content { padding: 40px 20px; background: var(--white); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 40px; }
+        .seo-content h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 1.8rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .seo-content h3 { color: var(--secondary-color); margin: 30px 0 15px 0; font-size: 1.4rem; }
+        .seo-content p { margin-bottom: 18px; font-size: 1.05rem; color: #444; }
+        .seo-content ul, .seo-content ol { margin-bottom: 20px; padding-left: 25px; }
+        .seo-content li { margin-bottom: 10px; color: #444; }
+
+        /* --- Advanced Premium FAQ UI --- */
+        .advanced-faq-container { margin-top: 50px; padding-top: 40px; border-top: 2px solid #eaeaea; }
+        .faq-title { color: var(--primary-color); font-size: 2rem; text-align: center; margin-bottom: 30px; font-weight: 700; }
+        .faq-wrapper { display: flex; flex-direction: column; gap: 15px; }
+        .premium-faq { background: var(--white); border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+        .premium-faq[open] { border-color: var(--primary-color); box-shadow: 0 8px 24px rgba(11, 61, 145, 0.08); transform: translateY(-2px); }
+        .premium-faq summary { padding: 20px 25px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; background: var(--white); user-select: none; }
+        .premium-faq summary::-webkit-details-marker { display: none; }
+        .faq-question-text { font-size: 1.15rem; font-weight: 600; color: var(--text-color); line-height: 1.4; padding-right: 20px; transition: color 0.3s ease; }
+        .premium-faq[open] .faq-question-text { color: var(--primary-color); }
+        .faq-icon { position: relative; width: 24px; height: 24px; flex-shrink: 0; }
+        .faq-icon::before, .faq-icon::after { content: ''; position: absolute; background-color: var(--primary-color); border-radius: 2px; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; }
+        .faq-icon::before { top: 11px; left: 0; width: 24px; height: 3px; }
+        .faq-icon::after { top: 0; left: 10.5px; width: 3px; height: 24px; }
+        .premium-faq[open] .faq-icon::before { transform: rotate(180deg); background-color: var(--secondary-color); }
+        .premium-faq[open] .faq-icon::after { transform: rotate(90deg); background-color: var(--secondary-color); }
+        .faq-answer-body { padding: 0 25px 25px 25px; color: #555; font-size: 1.05rem; line-height: 1.6; border-top: 1px solid transparent; animation: faqFadeIn 0.5s ease forwards; }
+        .faq-answer-body p { margin-bottom: 0; margin-top: 15px; }
+        @keyframes faqFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Featured Blog Grid --- */
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .blog-card { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; border: 1px solid #eee; }
+        .blog-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(11, 61, 145, 0.1); border-color: var(--primary-color); }
+        .blog-card-content { padding: 25px; }
+        .blog-badge { background: #e0f7fa; color: var(--secondary-color); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; margin-bottom: 15px; }
+        .blog-card h3 { color: var(--primary-color); font-size: 1.3rem; margin-bottom: 15px; line-height: 1.4; }
+        .blog-card p { color: #555; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.6; }
+        .read-more { color: var(--secondary-color); font-weight: bold; text-decoration: none; font-size: 1rem; transition: color 0.2s; }
+        .read-more:hover { color: var(--primary-color); }
+
+        /* --- Footer & Modals --- */
+        footer { background-color: #222; color: #fff; padding: 40px 0 20px 0; text-align: center; }
+        .footer-content { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .footer-links a { color: #ccc; text-decoration: none; margin: 0 10px; cursor: pointer; }
+        .footer-links a:hover { color: var(--white); }
+        .btn-coffee { background-color: #FFDD00; color: #000; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; transition: transform 0.2s; }
+        .btn-coffee:hover { transform: scale(1.05); }
+        .copyright { font-size: 0.9rem; color: #777; margin-top: 20px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--white); padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; position: relative; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: var(--text-color); text-align: left; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #777; background: none; border: none; font-weight: bold; }
+        .modal-close:hover { color: #000; }
+        .modal-body h2 { color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.5rem; }
+        .modal-body p { margin-bottom: 15px; font-size: 0.95rem; color: #444; }
+
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 15px; }
+            .slider-container { flex-direction: column; align-items: stretch; }
+            input[type="number"].slider-input { width: 100%; }
+            .action-buttons { flex-direction: column; }
+            .btn-action { width: 100%; justify-content: center; }
+        }
+    </style>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "Solar ROI Calculator",
+          "operatingSystem": "Web",
+          "applicationCategory": "FinanceApplication",
+          "description": "Calculate rooftop solar system size, cost, and PM Surya Ghar subsidies across 36 Indian states.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How much is the PM Surya Ghar subsidy for a 3kW system in 2026?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Under the latest guidelines, you receive ₹30,000 per kW for the first 2kW, and an additional ₹18,000 for the third kW. This brings the maximum Central Financial Assistance (CFA) to ₹78,000. Any capacity above 3kW does not receive additional central subsidy."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What happens to my on-grid solar system during a power cut?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "For safety reasons, standard on-grid solar inverters automatically shut down during a grid power cut (a feature called Anti-Islanding). This prevents your panels from sending electricity into the grid while linemen are working on it. If you have frequent power cuts, you will need an Off-Grid or Hybrid system with a battery backup."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How exactly does Net Metering reduce my electricity bill?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Your local DISCOM replaces your standard meter with a bi-directional net meter. During the day, surplus solar power is exported to the grid. At night, you import power from the grid. At the end of the month, you are only billed for the 'net' difference between your imports and exports."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I get a bank loan for my rooftop solar installation?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, major banks offer specialized, collateral-free solar loans for residential systems under the PM Surya Ghar scheme. Interest rates typically range from 8% to 10%, and the monthly EMI is often lower than your existing electricity bill."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the lifespan and maintenance requirement of the panels?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "High-quality monocrystalline panels have a lifespan of over 25 years. They require virtually zero technical maintenance. Simply rinsing the panels with water every few weeks to remove dust and debris will ensure they operate at peak efficiency."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the cost of a 3kW solar system with subsidy in 2026?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "In 2026, a standard 3kW on-grid system costs approximately ₹1,65,000 to ₹1,80,000. After applying the maximum PM Surya Ghar central subsidy of ₹78,000, the net out-of-pocket cost drops to roughly ₹87,000 to ₹1,02,000, depending on state-level top-up subsidies and panel technology (like TOPCon vs standard Mono PERC)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is solar subsidy available for rented houses in 2026?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The PM Surya Ghar Muft Bijli Yojana requires the electricity meter and the property roof rights to be in the applicant's name. Therefore, tenants in rented houses cannot directly apply for the subsidy. The landlord or property owner must be the one to apply and authorize the installation."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How much roof area is required for 1kW solar panels?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "For modern, high-efficiency panels (like N-Type or Bifacial), you need approximately 80 to 100 square feet of shadow-free roof area per 1kW of installation. A standard 3kW residential system requires about 300 square feet of space."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are Bifacial and TOPCon solar panels worth the extra cost?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, especially for homes with limited roof space. TOPCon and Bifacial panels degrade slower, perform better in extreme Indian summer heat, and can generate up to 10% more energy over their lifespan compared to older panel types, easily justifying their slightly higher upfront cost."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How to get zero electricity bills in 2026?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "To achieve a zero bill, you must install an on-grid solar system sized slightly larger than your average monthly consumption, combined with a Net Metering agreement. The excess power you export to the grid during the day offsets the power you pull from the grid at night."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">☀️ Solar ROI Calculator</div>
+        <ul class="nav-links">
+            <li><a href="#calculator">Calculator</a></li>
+            <li><a href="#learn-more">About Solar</a></li>
+            <li><a href="/blog/index.html">Blog</a></li>
+            <li><a data-modal="privacy-modal">Privacy Policy</a></li>
+            <li><a data-modal="contact-modal">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="calculator" class="hero-section">
+            <div class="container">
+                <div id="pdf-content" class="calculator-card glass-panel">
+                    <h1>Calculate Your Solar Savings</h1>
+                    <p class="subtitle">Find out your system size, cost, and combined government subsidy instantly.</p>
+                    
+                    <div class="input-group">
+                        <label for="state">Select Your State/UT:</label>
+                        <select id="state">
+                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chandigarh">Chandigarh</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Ladakh">Ladakh</option>
+                            <option value="Lakshadweep">Lakshadweep</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Puducherry">Puducherry</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Pradesh" selected>Uttar Pradesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>System Type:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="sysType" value="ongrid" checked> On-Grid (Subsidized)</label>
+                            <label><input type="radio" name="sysType" value="offgrid"> Off-Grid with Battery (No Subsidy)</label>
+                        </div>
+                        <div id="offgrid-warning" class="capacity-warning">Note: Government subsidies are only applicable for On-Grid systems. Batteries are not subsidized.</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="billSlider">Average Monthly Electricity Bill (₹):</label>
+                        <div class="slider-container">
+                            <input type="range" id="billSlider" min="500" max="30000" step="100" value="2000">
+                            <input type="number" id="billInput" class="slider-input" min="500" max="30000" value="2000">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="roofSlider">Available Roof Space (sq. ft.):</label>
+                        <div class="slider-container">
+                            <input type="range" id="roofSlider" min="100" max="5000" step="50" value="500">
+                            <input type="number" id="roofInput" class="slider-input" min="100" max="5000" value="500">
+                        </div>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <h3>Recommended Size</h3>
+                            <div style="color: #d9534f; font-size: 0.75rem; margin-top: 5px; margin-bottom: 5px; font-weight: 600;">* Max limit: Your Sanctioned Grid Load (e.g., 2kW load = 2kW max solar)</div>
+                            <p id="res-size">-- kW</p>
+                        </div>
+                        <div class="result-box">
+                            <h3>Total Cost</h3>
+                            <p id="res-total">₹ --</p>
+                        </div>
+                        <div class="result-box highlight">
+                            <h3>Total Subsidy</h3>
+                            <p id="res-subsidy">₹ --</p>
+                            <div id="subsidy-breakdown" class="subsidy-subtext">(Central: ₹0 | State: ₹0)</div>
+                        </div>
+                        <div class="result-box focus">
+                            <h3>Net Cost</h3>
+                            <p id="res-net">₹ --</p>
+                        </div>
+                        <div class="result-box focus-green">
+                            <h3>Payback Period</h3>
+                            <p id="res-roi">-- Years</p>
+                        </div>
+                        <div class="result-box">
+                            <h3>Estimated EMI (5 Yrs)</h3>
+                            <p id="res-emi">₹ --</p>
+                            <div id="emi-indicator" class="emi-indicator"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="capacity-warning" class="capacity-warning">
+                        Note: Commercial tariffs and tax rules may apply for systems over 10kW.
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="#" id="whatsapp-btn" class="btn-action btn-whatsapp" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+                        Share on WhatsApp
+                    </a>
+                    <button id="pdf-btn" class="btn-action btn-pdf">
+                        📄 Download PDF Estimate
+                    </button>
+                </div>
+
+                <div class="lead-gen-card">
+                    <h2>Get 3 Free Verified Installation Quotes in Your Area.</h2>
+                    <p>We are currently onboarding top-rated MNRE approved installers in your region.</p>
+                    <button type="button" id="submit-lead" class="btn-action btn-submit" style="background-color: #6c757d; cursor: not-allowed; border: none;">
+                        Service Available Soon
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="ad-banner-placeholder" aria-label="Advertisement">AdSense Banner 1</div>
+
+        <section id="learn-more" class="container">
+            <article class="seo-content">
+                <h2>A Complete Guide to Solar ROI in India (2026 Edition)</h2>
+                <p>With power tariffs expected to increase by 10-15% in 2026, millions of Indian homeowners are turning to rooftop solar as a viable, long-term solution to achieve zero electricity bills. Understanding how to calculate your Return on Investment (ROI) is the most critical step before adopting solar energy. Utilizing a highly accurate rooftop solar calculator ensures you size your system correctly, preventing over-capitalization while maximizing your electricity bill savings.</p>
+
+                <p>This comprehensive guide explains everything you need to know about the current solar landscape, breaking down the costs, evaluating the latest government incentives, and helping you understand the real-world performance of your solar asset.</p>
+                
+                <h3>Understanding PM Surya Ghar Muft Bijli Yojana 2026</h3>
+                <p>The PM Surya Ghar Muft Bijli Yojana 2026 stands as one of the most aggressive renewable energy initiatives globally, aimed at lighting up Indian households with free electricity while drastically reducing carbon footprints. The Central Financial Assistance (CFA) or solar subsidy has been meticulously designed to lower the barrier to entry for middle-class families.</p>
+                
+                <p>Under the latest 2026 guidelines, the subsidy structure is highly favorable for residential sectors:</p>
+                <ul>
+                    <li><strong>Systems up to 2 kW:</strong> Homeowners receive a robust subsidy of ₹30,000 per kW. This effectively cuts the benchmark installation costs in half for small-scale users.</li>
+                    <li><strong>Systems between 2 kW and 3 kW:</strong> You receive the ₹60,000 baseline (for the first 2 kW) plus an additional ₹18,000 for the third kW. This brings the total available subsidy to a maximum of ₹78,000.</li>
+                    <li><strong>Systems above 3 kW:</strong> The subsidy is capped at a flat maximum of ₹78,000. This cap encourages homeowners to right-size their systems based on genuine residential consumption rather than commercial-level generation.</li>
+                </ul>
+                <p>It is important to note that these subsidies are processed directly via the National Portal for Rooftop Solar. To qualify, you must hire a vendor registered with your local DISCOM and ensure that the components used (like DCR solar panels) meet the Ministry of New and Renewable Energy (MNRE) guidelines.</p>
+
+                <h3>Why State Tariffs Impact Your ROI</h3>
+                <p>A major mistake homeowners make is assuming standard returns across India. In reality, your solar ROI is heavily dependent on the per-unit (kWh) electricity rate charged by your state distribution company (DISCOM). States with historically high grid tariffs offer significantly faster solar payback periods.</p>
+                <p>For instance, residential consumers in Maharashtra currently face tariffs averaging around ₹10.0 per unit. A homeowner in Mumbai or Pune installing a 3 kW system will offset a much more expensive bill compared to a homeowner in Delhi, where baseline subsidies keep the average unit cost closer to ₹4.5. Consequently, a high-tariff state yields an ROI of roughly 3 to 4 years, whereas a lower-tariff state might extend that payback period to 5 or 6 years. Our dynamic calculator automatically fetches the state-specific tariff data, ensuring the math reflects your local economic reality.</p>
+
+                <h3>1kW Solar Panel Price in India & Hardware Choices</h3>
+                <p>Currently, the benchmark 1kW solar panel price in India averages around ₹60,000. However, prices vary based on the technology you choose. When deciding on panels, the primary choice for Indian roofs today leans heavily towards <strong>monocrystalline solar panels</strong>.</p>
+                <p>Unlike older polycrystalline alternatives, 2026 is dominated by high-efficiency technologies like TOPCon (Tunnel Oxide Passivated Contact) and N-Type Bifacial panels. These panels offer superior efficiency, often exceeding 22%, and capture sunlight from both sides. They generate more power in a smaller footprint—crucial for urban Indian homes—and are supplied by top-tier manufacturers like Tata Power, Waaree, and Adani Solar.</p>
+
+                <h3>Understanding Net Metering Rules in India</h3>
+                <p>Net metering is the billing mechanism that makes residential solar financially viable. When your on-grid solar system generates more electricity than your household consumes during the day, the excess power is automatically exported back to the grid. In return, your state DISCOM credits your account. At the end of the billing cycle, you are only billed for your "net" consumption. If you export more than you import, the surplus is often carried forward to the next month or compensated at a pre-determined feed-in tariff. Note that net metering policies and capacity limits vary significantly from state to state, making it crucial to consult your local utility guidelines.</p>
+
+                <h3>Maintenance and Lifespan of Solar Systems</h3>
+                <p>A common misconception is that rooftop solar requires heavy maintenance. In reality, solar PV systems have no moving parts, making them incredibly low-maintenance. The primary upkeep involves periodic cleaning of the panels to remove dust, bird droppings, and debris, which can otherwise reduce efficiency by 5% to 10%. Rinsing the panels with water every few weeks is generally sufficient. A high-quality monocrystalline solar panel is built to last 25 to 30 years, with a standard performance warranty guaranteeing at least 80% output at the end of year 25. The solar inverter, however, may need replacement once after 10 to 15 years. If you live in a highly dusty environment, consider AI-driven smart inverters from brands like Growatt or Servotech, which provide real-time cleaning alerts via mobile apps.</p>
+
+                <h3>Financing Your Solar Plant: Solar Loans and EMI</h3>
+                <p>The initial capital required for installing a rooftop solar system can be a hurdle for many homeowners. Fortunately, the Indian banking sector has introduced specialized "Solar Loans" tailored for residential installations. Major public and private banks offer collateral-free loans at competitive interest rates (typically ranging from 8.5% to 10% per annum) with flexible repayment tenures of up to 5 years. As our EMI vs. Current Bill estimator demonstrates, your monthly loan EMI is often lower than your existing electricity bill. This means your solar system effectively pays for itself from day one, allowing you to transition to clean energy with zero net out-of-pocket expenses on a month-to-month basis.</p>
+
+                <div class="advanced-faq-container">
+                    <h2 class="faq-title">Frequently Asked Questions</h2>
+                    <div class="faq-wrapper">
+                        <details class="premium-faq" name="solar-faq" open>
+                            <summary><span class="faq-question-text">How much is the PM Surya Ghar subsidy for a 3kW system in 2026?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>Under the latest guidelines, you receive <strong>₹30,000 per kW</strong> for the first 2kW, and an additional <strong>₹18,000</strong> for the third kW. This brings the maximum Central Financial Assistance (CFA) to <strong>₹78,000</strong>. Any capacity above 3kW does not receive additional central subsidy, though state-specific top-ups may apply.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">What happens to my on-grid solar system during a power cut?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>For safety reasons, standard on-grid solar inverters automatically shut down during a grid power cut (a mandatory safety feature called <em>Anti-Islanding</em>). This prevents your panels from sending live electricity into the grid while utility workers are fixing the lines. If your area experiences frequent power cuts, you must opt for an <strong>Off-Grid</strong> or <strong>Hybrid</strong> system with a battery backup.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">How exactly does Net Metering reduce my electricity bill?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>Your local electricity board (DISCOM) will replace your standard meter with a <strong>bi-directional net meter</strong>. During peak sunlight, any surplus power your home doesn't use is exported to the grid. At night, you import power from the grid. At the end of the billing cycle, you are only charged for the "net" difference. If you export more than you import, the surplus is usually credited to your next bill.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">Can I get a bank loan for my rooftop solar installation?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p><strong>Yes.</strong> Major public sector banks (like SBI, Union Bank) and private lenders offer specialized, collateral-free solar loans for residential setups. Interest rates typically range from 8% to 10% per annum. In most cases, because your electricity bill drops to zero, the savings easily cover the monthly loan EMI, making it a cash-flow positive investment from day one.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">What is the lifespan and maintenance requirement of the panels?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>Tier-1 monocrystalline solar panels are built to withstand extreme weather and come with a <strong>25-year performance warranty</strong>. They require no technical maintenance. Simply rinsing the glass surface with water every two weeks to remove dust, leaves, and bird droppings will ensure the system operates at maximum efficiency for decades. The string inverter may require replacement once every 10 to 15 years.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">What is the cost of a 3kW solar system with subsidy in 2026?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>In 2026, a standard 3kW on-grid system costs approximately ₹1,65,000 to ₹1,80,000. After applying the maximum PM Surya Ghar central subsidy of ₹78,000, the net out-of-pocket cost drops to roughly ₹87,000 to ₹1,02,000, depending on state-level top-up subsidies and panel technology (like TOPCon vs standard Mono PERC).</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">Is solar subsidy available for rented houses in 2026?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>The PM Surya Ghar Muft Bijli Yojana requires the electricity meter and the property roof rights to be in the applicant's name. Therefore, tenants in rented houses cannot directly apply for the subsidy. The landlord or property owner must be the one to apply and authorize the installation.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">How much roof area is required for 1kW solar panels?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>For modern, high-efficiency panels (like N-Type or Bifacial), you need approximately 80 to 100 square feet of shadow-free roof area per 1kW of installation. A standard 3kW residential system requires about 300 square feet of space.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">Are Bifacial and TOPCon solar panels worth the extra cost?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>Yes, especially for homes with limited roof space. TOPCon and Bifacial panels degrade slower, perform better in extreme Indian summer heat, and can generate up to 10% more energy over their lifespan compared to older panel types, easily justifying their slightly higher upfront cost.</p></div>
+                        </details>
+                        <details class="premium-faq" name="solar-faq">
+                            <summary><span class="faq-question-text">How to get zero electricity bills in 2026?</span><div class="faq-icon"></div></summary>
+                            <div class="faq-answer-body"><p>To achieve a zero bill, you must install an on-grid solar system sized slightly larger than your average monthly consumption, combined with a Net Metering agreement. The excess power you export to the grid during the day offsets the power you pull from the grid at night.</p></div>
+                        </details>
+                    </div>
+                </div>
+
+            </article>
+        </section>
+
+        <div class="ad-banner-placeholder" aria-label="Advertisement">AdSense Banner 2</div>
+
+        <section class="container" style="margin-bottom: 60px;">
+            <h2 style="color: var(--primary-color); text-align: center; margin-bottom: 30px; font-size: 2rem;">Latest Solar Guides & News</h2>
+            <div class="blog-grid">
+                
+                <div class="blog-card">
+                    <div class="blog-card-content">
+                        <span class="blog-badge">Subsidies 2026</span>
+                        <h3>3kW Solar System Price with PM Surya Ghar Subsidy</h3>
+                        <p>Discover the exact cost, hardware requirements, and maximum government financial aid for the most popular residential solar setup.</p>
+                        <a href="/blog/3kw-solar-system-price-subsidy-2026.html" class="read-more">Read Full Guide →</a>
+                    </div>
+                </div>
+
+                <div class="blog-card">
+                    <div class="blog-card-content">
+                        <span class="blog-badge">Technology</span>
+                        <h3>TOPCon vs. Bifacial Solar Panels: Which is Best?</h3>
+                        <p>A deep dive into 2026's most advanced solar panel technologies and which one offers the highest ROI for limited Indian roof spaces.</p>
+                        <a href="/blog/topcon-vs-bifacial-solar-panels.html" class="read-more">Read Full Guide →</a>
+                    </div>
+                </div>
+
+                <div class="blog-card">
+                    <div class="blog-card-content">
+                        <span class="blog-badge">Policy</span>
+                        <h3>State-by-State Net Metering Rules Explained</h3>
+                        <p>Learn how your local DISCOM calculates your surplus energy exports and how to guarantee a zero electricity bill.</p>
+                        <a href="/blog/state-net-metering-rules-india.html" class="read-more">Read Full Guide →</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a data-modal="about-modal">About Us</a>
+                <a data-modal="privacy-modal">Privacy Policy</a>
+                <a data-modal="terms-modal">Terms of Service</a>
+            </div>
+            <div class="support-us">
+                <a href="https://buymeacoffee.com/yourlink" target="_blank" class="btn-coffee">☕ Buy Me A Coffee</a>
+            </div>
+            <p class="copyright">&copy; 2026 Solar ROI Calculator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="privacy-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Privacy Policy</h2><p>Welcome to Solar ROI Calculator. Your privacy is critically important to us. This Privacy Policy explains how we collect, use, and protect your information when you use our rooftop solar calculator.</p><p>We do not collect personal identification information unless you explicitly provide it (e.g., via contact forms). Non-personal data, such as browser type and geographical location, may be collected to improve user experience.</p><p><strong>Third-Party Advertising:</strong> We use third-party advertising companies, such as Google AdSense, to serve ads when you visit our website. These companies may use aggregated information about your visits to this and other Web sites in order to provide advertisements about goods and services of interest to you.</p></div></div>
+    </div>
+    <div id="terms-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Terms of Service</h2><p>By accessing and using Solar ROI Calculator, you accept and agree to be bound by the terms and provision of this agreement.</p><p><strong>Estimates Only:</strong> The calculations, recommendations, and results provided by this application are estimates based on standard assumptions and current government guidelines. They are for informational purposes only.</p><p><strong>No Financial Liability:</strong> Solar ROI Calculator shall not be responsible or liable for the accuracy, usefulness or availability of any information transmitted via the site.</p></div></div>
+    </div>
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>About Us</h2><p>Solar ROI Calculator is an independent platform dedicated to helping Indian homeowners transition to renewable energy. We provide free, accurate, and up-to-date data on solar subsidies, costs, and technology.</p></div></div>
+    </div>
+    <div id="contact-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Contact Us</h2><p>For inquiries, partnership opportunities, or feedback, please reach out to us at: <strong>creationsdigitalai@gmail.com</strong></p></div></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Safe DOM Element Fetching
+            const stateSelect = document.getElementById('state');
+            const sysTypeRadios = document.getElementsByName('sysType');
+            const offgridWarning = document.getElementById('offgrid-warning');
+            
+            const billSlider = document.getElementById('billSlider');
+            const billInput = document.getElementById('billInput');
+            const roofSlider = document.getElementById('roofSlider');
+            const roofInput = document.getElementById('roofInput');
+
+            const resSize = document.getElementById('res-size');
+            const resTotal = document.getElementById('res-total');
+            const resSubsidy = document.getElementById('res-subsidy');
+            const subsidyBreakdown = document.getElementById('subsidy-breakdown');
+            const resNet = document.getElementById('res-net');
+            const resRoi = document.getElementById('res-roi');
+            const resEmi = document.getElementById('res-emi');
+            const emiIndicator = document.getElementById('emi-indicator');
+            
+            const whatsappBtn = document.getElementById('whatsapp-btn');
+            const capacityWarning = document.getElementById('capacity-warning');
+            const pdfBtn = document.getElementById('pdf-btn');
+            const submitLeadBtn = document.getElementById('submit-lead');
+
+            let chartInstance = null;
+
+            // Modal Logic
+            const modalLinks = document.querySelectorAll('[data-modal]');
+            const modalCloses = document.querySelectorAll('.modal-close');
+            
+            if(modalLinks && modalCloses) {
+                Array.from(modalLinks).forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('data-modal');
+                        const target = document.getElementById(targetId);
+                        if (target) target.classList.add('active');
+                    });
+                });
+                Array.from(modalCloses).forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const overlay = btn.closest('.modal-overlay');
+                        if(overlay) overlay.classList.remove('active');
+                    });
+                });
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
+                });
+            }
+
+            // 36 State/UT Tariffs Dictionary
+            const stateTariffs = {
+                "Andaman and Nicobar Islands": 6.0, "Andhra Pradesh": 7.0, "Arunachal Pradesh": 5.5,
+                "Assam": 7.5, "Bihar": 7.5, "Chandigarh": 5.0, "Chhattisgarh": 6.0,
+                "Dadra and Nagar Haveli and Daman and Diu": 5.0, "Delhi": 4.5, "Goa": 5.0,
+                "Gujarat": 6.0, "Haryana": 7.0, "Himachal Pradesh": 5.5, "Jammu and Kashmir": 4.0,
+                "Jharkhand": 6.5, "Karnataka": 7.5, "Kerala": 7.0, "Ladakh": 4.0, "Lakshadweep": 6.0,
+                "Madhya Pradesh": 7.5, "Maharashtra": 10.0, "Manipur": 6.0, "Meghalaya": 6.0,
+                "Mizoram": 6.0, "Nagaland": 6.0, "Odisha": 6.0, "Puducherry": 4.5, "Punjab": 6.5,
+                "Rajasthan": 7.5, "Sikkim": 5.0, "Tamil Nadu": 6.5, "Telangana": 7.0,
+                "Tripura": 6.5, "Uttar Pradesh": 7.5, "Uttarakhand": 6.0, "West Bengal": 8.0
+            };
+
+            const currencyFormatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+            // Sync Inputs with Data Validation
+            function syncInputs(slider, input) {
+                slider.addEventListener('input', () => { 
+                    input.value = slider.value; 
+                    calculateSolar(); 
+                });
+                input.addEventListener('input', () => {
+                    let val = parseInt(input.value);
+                    if (isNaN(val)) val = 0;
+                    
+                    if(val > parseInt(input.max)) val = input.max;
+                    
+                    slider.value = val;
+                    calculateSolar();
+                });
+                
+                input.addEventListener('blur', () => {
+                    let val = parseInt(input.value);
+                    if (isNaN(val) || val < parseInt(input.min)) {
+                        input.value = input.min;
+                        slider.value = input.min;
+                        calculateSolar();
+                    }
+                });
+            }
+            
+            syncInputs(billSlider, billInput);
+            syncInputs(roofSlider, roofInput);
+            stateSelect.addEventListener('change', calculateSolar);
+            
+            Array.from(sysTypeRadios).forEach(radio => radio.addEventListener('change', calculateSolar));
+
+            // Core Math Logic
+            function calculateSolar() {
+                const monthlyBill = parseInt(billInput.value) || 0;
+                const roofSpace = parseInt(roofInput.value) || 0;
+                const selectedState = stateSelect.value;
+                const tariff = stateTariffs[selectedState] || 7.0;
+                
+                // Check Battery Toggle
+                let isOffGrid = false;
+                for (const radio of sysTypeRadios) {
+                    if (radio.checked && radio.value === 'offgrid') { isOffGrid = true; break; }
+                }
+
+                const unitsPerKwMonth = 120;
+                const sqFtPerKw = 100;
+                
+                // Advanced System Sizing Math
+                // Round required kW strictly to nearest 0.5 based purely on bill
+                let requiredKwByBill = (monthlyBill / tariff) / unitsPerKwMonth;
+                requiredKwByBill = Math.round(requiredKwByBill * 2) / 2;
+                
+                let maxKwByRoof = roofSpace / sqFtPerKw;
+
+                // Set systemKw bounded by roof limits, force rounding down to nearest 0.5, minimum 1 kW
+                let systemKw = Math.min(requiredKwByBill, maxKwByRoof);
+                systemKw = Math.max(1, Math.floor(systemKw * 2) / 2);
+
+                // Tiered Pricing Engine
+                let costPerKw = 60000; // default fallback
+                if (systemKw <= 1) {
+                    costPerKw = 65000;
+                } else if (systemKw > 1 && systemKw <= 2) {
+                    costPerKw = 60000;
+                } else if (systemKw > 2 && systemKw <= 3) {
+                    costPerKw = 55000;
+                } else {
+                    costPerKw = 50000;
+                }
+
+                // Add battery cost constraint
+                if (isOffGrid) {
+                    costPerKw += 20000;
+                    if(offgridWarning) offgridWarning.classList.add('inline-visible');
+                } else {
+                    if(offgridWarning) offgridWarning.classList.remove('inline-visible');
+                }
+
+                const totalCost = systemKw * costPerKw;
+
+                // Subsidy Logic (Wiped if Off-Grid)
+                let centralSubsidy = 0;
+                let stateSubsidy = 0;
+                
+                if (!isOffGrid) {
+                    if (systemKw <= 2) {
+                        centralSubsidy = systemKw * 30000;
+                    } else if (systemKw > 2 && systemKw <= 3) {
+                        centralSubsidy = 60000 + ((systemKw - 2) * 18000);
+                    } else {
+                        centralSubsidy = 78000;
+                    }
+
+                    if (selectedState === "Uttar Pradesh") stateSubsidy = Math.min(systemKw * 15000, 30000);
+                    else if (selectedState === "Gujarat") stateSubsidy = systemKw * 10000;
+                    else if (selectedState === "Rajasthan") stateSubsidy = systemKw * 5000;
+                    else if (selectedState === "Uttarakhand") stateSubsidy = systemKw > 0 ? 15000 : 0;
+                }
+                
+                const totalSubsidy = centralSubsidy + stateSubsidy;
+                const netCost = Math.max(0, totalCost - totalSubsidy);
+
+                // Savings and ROI Math
+                const calculatedMonthlySavings = systemKw * unitsPerKwMonth * tariff;
+                const actualMonthlySavings = Math.min(monthlyBill, calculatedMonthlySavings);
+                const annualSavings = actualMonthlySavings * 12;
+                const roiYears = annualSavings > 0 ? (netCost / annualSavings) : 0;
+
+                // EMI Math
+                const annualInterestRate = 0.09;
+                const monthlyInterestRate = annualInterestRate / 12;
+                const loanTenureMonths = 60;
+                let emi = 0;
+                if(netCost > 0) {
+                    const compoundFactor = Math.pow(1 + monthlyInterestRate, loanTenureMonths);
+                    emi = (netCost * monthlyInterestRate * compoundFactor) / (compoundFactor - 1);
+                }
+                const savingsVsEmi = monthlyBill - emi;
+
+                // DOM Updates
+                if(resSize) resSize.innerText = `${systemKw.toFixed(1)} kW`;
+                if(resTotal) resTotal.innerText = currencyFormatter.format(totalCost);
+                if(resSubsidy) resSubsidy.innerText = currencyFormatter.format(totalSubsidy);
+                if(subsidyBreakdown) subsidyBreakdown.innerText = `(Central: ₹${centralSubsidy.toLocaleString('en-IN')} | State: ₹${stateSubsidy.toLocaleString('en-IN')})`;
+                if(resNet) resNet.innerText = currencyFormatter.format(netCost);
+                if(resRoi) resRoi.innerText = `${roiYears.toFixed(1)} Years`;
+                if(resEmi) resEmi.innerText = currencyFormatter.format(emi) + " /mo";
+
+                if (emiIndicator) {
+                    if (savingsVsEmi > 0) {
+                        emiIndicator.innerText = `₹${Math.round(savingsVsEmi)} cheaper than your current bill!`;
+                        emiIndicator.className = "emi-indicator green";
+                    } else {
+                        emiIndicator.innerText = `₹${Math.round(Math.abs(savingsVsEmi))} more than your current bill.`;
+                        emiIndicator.className = "emi-indicator red";
+                    }
+                }
+
+                if (capacityWarning) {
+                    if (systemKw > 10) capacityWarning.classList.add('visible');
+                    else capacityWarning.classList.remove('visible');
+                }
+
+                // WhatsApp String Builder outputs updated rounded math
+                if (whatsappBtn) {
+                    const sysTypeText = isOffGrid ? "Off-Grid System (with Battery)" : "On-Grid System";
+                    const waMessage = `I just calculated my rooftop solar savings! ☀️ I need a ${systemKw.toFixed(1)} kW ${sysTypeText}, and my net cost is ₹${netCost.toLocaleString('en-IN')}. My payback period is only ${roiYears.toFixed(1)} years. Calculate yours here: https://solarroicalci.xyz`;
+                    whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
+                }
+                
+                // Render Chart
+                drawChart(monthlyBill, netCost);
+            }
+
+            // Chart.js Integrator
+            function drawChart(monthlyBill, netCost) {
+                const canvas = document.getElementById('roiChart');
+                if (!canvas || typeof Chart === 'undefined') return; 
+                
+                const ctx = canvas.getContext('2d');
+                const years = Array.from({length: 25}, (_, i) => `Year ${i + 1}`);
+                const gridCosts = Array.from({length: 25}, (_, i) => monthlyBill * 12 * (i + 1));
+                const solarCosts = Array.from({length: 25}, () => netCost);
+
+                if (chartInstance) chartInstance.destroy();
+
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [
+                            {
+                                label: 'Cost of Doing Nothing (Grid Bill)',
+                                data: gridCosts,
+                                borderColor: '#d9534f',
+                                backgroundColor: 'rgba(217, 83, 79, 0.1)',
+                                fill: true,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Cost of Solar Investment',
+                                data: solarCosts,
+                                borderColor: '#2e8b57',
+                                backgroundColor: 'rgba(46, 139, 87, 0.1)',
+                                fill: true,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Total Cost (₹)' } } },
+                        plugins: {
+                            title: { display: true, text: '25-Year Financial Projection' },
+                            tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN'); } } }
+                        }
+                    }
+                });
+            }
+
+            // PDF Exporter
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (typeof html2pdf === 'undefined') {
+                        alert("PDF generator is still loading, please try again in a second.");
+                        return;
+                    }
+                    
+                    const element = document.getElementById('pdf-content');
+                    if(!element) return;
+                    
+                    // Apply safe PDF styling
+                    element.classList.add('pdf-mode-active');
+
+                    const opt = {
+                        margin:       10,
+                        filename:     'SolarCalc-Estimate.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, // scrollY: 0 fixes the blank page bug
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    // Ensure DOM updates before capturing
+                    setTimeout(() => {
+                        html2pdf().set(opt).from(element).save().then(() => {
+                            // Remove safe styling after generation
+                            element.classList.remove('pdf-mode-active');
+                        });
+                    }, 300);
+                });
+            }
+
+            // Lead Form Submitter (Updated to show unavailable alert)
+            if (submitLeadBtn) {
+                submitLeadBtn.addEventListener('click', () => {
+                    alert("We are currently expanding our installer network in your area. This service will be available soon!");
+                });
+            }
+
+            // Initialize app
+            calculateSolar();
+        });
+    </script>
+</body>
+</html>
