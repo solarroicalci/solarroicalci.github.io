@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State-by-State Net Metering Rules Explained (2026) | Solar ROI Calculator</title>
+    <meta name="description" content="Understand how Net Metering works in India in 2026. Discover state-specific DISCOM rules, banking periods, and how to achieve a zero electricity bill.">
+    
+    <style>
+        /* --- EXACT HOMEPAGE STYLING --- */
+        :root {
+            --primary-color: #0b3d91;
+            --secondary-color: #2e8b57;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Navbar --- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background-color: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: color 0.3s ease; cursor: pointer; }
+        .nav-links a:hover { color: var(--primary-color); }
+        .nav-links a.active { color: var(--primary-color); font-weight: 700; border-bottom: 2px solid var(--primary-color); }
+
+        /* --- Blog Specific Layout --- */
+        .blog-header-bg {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            padding: 60px 0 40px 0; text-align: center; border-bottom: 1px solid var(--glass-border);
+        }
+        .blog-header-bg h1 { color: var(--primary-color); font-size: 2.5rem; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .blog-meta { color: #555; font-weight: 500; }
+        
+        .blog-container { max-width: 800px; margin: -30px auto 50px auto; padding: 0 20px; position: relative; z-index: 10; }
+        
+        .seo-content { 
+            padding: 50px; background: var(--white); border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+        }
+        .seo-content h2 { color: var(--primary-color); margin: 40px 0 20px 0; font-size: 1.8rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .seo-content h3 { color: var(--secondary-color); margin: 30px 0 15px 0; font-size: 1.4rem; }
+        .seo-content p { margin-bottom: 20px; font-size: 1.1rem; color: #444; line-height: 1.8; }
+        .seo-content ul, .seo-content ol { margin-bottom: 25px; padding-left: 25px; font-size: 1.1rem; line-height: 1.8; color: #444; }
+        .seo-content li { margin-bottom: 10px; }
+
+        /* CTA Button styling */
+        .btn-action {
+            color: var(--white); padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; 
+            display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; 
+            transition: transform 0.2s, background-color 0.3s; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(11, 61, 145, 0.3);
+            background-color: var(--primary-color); width: 100%;
+        }
+        .btn-action:hover { background-color: #082d6b; transform: translateY(-3px); }
+
+        .cta-box {
+            background: #f8f9fa; border-left: 5px solid var(--primary-color); padding: 30px; 
+            margin: 40px 0; border-radius: 0 12px 12px 0; text-align: center;
+        }
+        .cta-box h3 { margin-top: 0; color: var(--primary-color); border: none; }
+
+        /* --- AdSense Placeholders --- */
+        .ad-banner-placeholder {
+            width: 100%; max-width: 728px; height: 90px; margin: 40px auto; background-color: #eaeaea;
+            display: flex; justify-content: center; align-items: center; color: #999; font-size: 0.8rem; border: 1px dashed #ccc;
+        }
+
+        /* --- Mobile Sticky CTA --- */
+        .sticky-cta { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); padding: 15px; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); z-index: 999; text-align: center; }
+        .sticky-cta .btn-action { margin: 0; padding: 12px 20px; font-size: 1.1rem; }
+        @media (max-width: 768px) { .sticky-cta { display: block; } body { padding-bottom: 70px; } }
+
+        /* --- Footer & Modals --- */
+        footer { background-color: #222; color: #fff; padding: 40px 0 20px 0; text-align: center; }
+        .footer-content { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .footer-links a { color: #ccc; text-decoration: none; margin: 0 10px; cursor: pointer; }
+        .footer-links a:hover { color: var(--white); }
+        .btn-coffee { background-color: #FFDD00; color: #000; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; transition: transform 0.2s; }
+        .btn-coffee:hover { transform: scale(1.05); }
+        .copyright { font-size: 0.9rem; color: #777; margin-top: 20px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--white); padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; position: relative; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: var(--text-color); text-align: left; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #777; background: none; border: none; font-weight: bold; }
+        .modal-close:hover { color: #000; }
+        .modal-body h2 { color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.5rem; }
+        .modal-body p { margin-bottom: 15px; font-size: 0.95rem; color: #444; }
+
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 15px; }
+            .seo-content { padding: 30px 20px; }
+            .blog-header-bg h1 { font-size: 2rem; padding: 0 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/index.html" class="logo">☀️ Solar ROI Calculator</a>
+        <ul class="nav-links">
+            <li><a href="/index.html">Calculator Tool</a></li>
+            <li><a href="/index.html#learn-more">About Solar</a></li>
+            <li><a href="/blog/index.html" class="active">Blog</a></li>
+            <li><a data-modal="privacy-modal">Privacy Policy</a></li>
+        </ul>
+    </nav>
+
+    <header class="blog-header-bg">
+        <h1>State-by-State Net Metering Rules Explained (2026 Guide)</h1>
+        <p class="blog-meta">Published: May 2026 | By Solar ROI Calculator Expert Team</p>
+    </header>
+
+    <main class="blog-container">
+        
+        <article class="seo-content">
+            <p>You’ve calculated your PM Surya Ghar subsidy, picked the perfect TOPCon panels, and are ready to install your rooftop solar system. But there is one final, critical hurdle that determines your actual financial savings: <strong>Your local DISCOM (Electricity Board).</strong></p>
+            
+            <p>While the central government pushes aggressively for solar adoption, the actual billing rules—specifically <em>Net Metering</em>—are controlled entirely at the state level. Understanding how your local electricity board calculates your exported power is the absolute secret to achieving a zero electricity bill.</p>
+
+            <div class="ad-banner-placeholder" aria-label="Advertisement">AdSense Banner 1</div>
+
+            <h2>How True Net Metering Works</h2>
+            <p>In a standard on-grid residential solar setup, you do not use expensive batteries. During peak sunlight hours, your solar panels generate much more electricity than your house consumes. This surplus electricity is pushed outwards into the city's power grid through a legally mandated <strong>Bi-Directional Net Meter</strong>.</p>
+            <p>At night, when your panels are inactive, you pull electricity back from the grid to run your ACs, TVs, and heavy appliances. Under <em>True Net Metering</em> (which operates on a 1:1 unit adjustment), the DISCOM simply subtracts the total units you exported during the day from the units you imported at night. If you imported 500 units but exported 450 units, you only pay the monetary tariff for the 50 "Net" units.</p>
+
+            <h2>The "Gross Metering" vs. "Net Billing" Trap</h2>
+            <p>Not all states offer True Net Metering for all solar capacities. Some states use alternative billing mechanisms that can drastically impact your Return on Investment (ROI):</p>
+            <ul>
+                <li><strong>Net Billing (or Net Feed-in):</strong> Instead of adjusting units 1:1, the DISCOM converts your exported units into money at a predetermined, lower rate (e.g., paying you ₹3 per unit), and subtracts that money from your import bill (which charges you ₹7.5 per unit). This extends your payback period significantly.</li>
+                <li><strong>Gross Metering:</strong> All solar power generated by your panels is exported directly to the grid at a fixed feed-in tariff. You continue to pay your standard import bill separately. This is rarely used for residential setups anymore, but is common for large commercial plants.</li>
+            </ul>
+
+            <div class="cta-box">
+                <h3>What is your exact State Subsidy & ROI?</h3>
+                <p>Every Indian state has different electricity tariffs and top-up subsidies. Use our <a href="/index.html" style="color: var(--primary-color); font-weight: bold; text-decoration: underline;">advanced ROI calculator</a> to instantly see the real-world math for your exact location and monthly bill.</p>
+                <a href="/index.html" class="btn-action">
+                    ⚡ Calculate Your Exact Solar Savings Now
+                </a>
+            </div>
+
+            <h2>What is the "Banking Period" and Why Does it Matter?</h2>
+            <p>If you generate more electricity than you consume in a single month (which happens frequently in pleasant winter months like November and December), your extra units are not lost. They are "banked" as credits with the DISCOM and carried forward to offset your high AC usage in the summer.</p>
+            <p>However, these banked units do not roll over forever. Every state has a <strong>Settlement Period</strong>—usually at the end of the financial year (March 31st). On this date, any unused banked units in your account are wiped out, and the DISCOM will usually compensate you for them at a very low flat rate (often ₹2.5 to ₹3 per unit). This is why you should never install a solar system that is drastically larger than your annual consumption.</p>
+
+            <h2>Top State Policies to Watch in 2026</h2>
+            <p>Let's look at how Net Metering is handled across some of the highest-adopting regions in India:</p>
+
+            <h3>Uttar Pradesh (UPPCL / PVVNL / Madhyanchal)</h3>
+            <p>Uttar Pradesh has become a massive hub for residential solar adoption. For homeowners in cities like Bareilly, Lucknow, and Noida, the local DISCOMs generally offer True Net Metering for residential capacities up to your Sanctioned Grid Load. UP allows banking of unutilized energy across billing cycles, settling accounts at the end of the financial year. The process has been highly streamlined via the national portal, making UP one of the most lucrative states for a 3kW installation.</p>
+
+            <h3>Delhi (BSES / Tata Power DDL)</h3>
+            <p>Delhi offers one of the most consumer-friendly net metering policies in the country. Because power demand is so high, the DISCOMs actively encourage rooftop generation. Group Net Metering and Virtual Net Metering frameworks are also active here, allowing housing societies to share solar generation across multiple apartments.</p>
+
+            <h3>Maharashtra (MSEDCL)</h3>
+            <p>Maharashtra heavily supports net metering, but they strictly enforce grid stability rules. You must ensure your local distribution transformer isn't already "full" with other solar homes (often capped at 70% of the transformer capacity). Once approved, the 1:1 net metering policy makes ROI exceptionally fast due to Maharashtra's high premium electricity tariffs.</p>
+
+            <h3>Karnataka (BESCOM)</h3>
+            <p>Karnataka has transitioned between Net Metering and Net Billing in the past, causing confusion. For 2026 residential setups under the PM Surya Ghar scheme (typically 1kW to 5kW), True Net Metering is generally applied. However, getting the bi-directional meter procured and tested by the MT division can sometimes introduce slight installation delays.</p>
+
+            <div class="ad-banner-placeholder" aria-label="Advertisement">AdSense Banner 2</div>
+
+            <h2>The 5-Step Net Metering Application Process</h2>
+            <p>While your chosen solar vendor will handle the heavy lifting, you should understand the timeline for getting your meter approved:</p>
+            <ol>
+                <li><strong>Feasibility Approval:</strong> Your vendor submits an application to the DISCOM to ensure your local grid can handle the power injection.</li>
+                <li><strong>Plant Installation:</strong> Once approved, the physical panels and inverter are installed on your roof.</li>
+                <li><strong>Work Completion Report (WCR):</strong> The vendor submits technical documents, wiring layouts, and inverter safety certificates to the DISCOM.</li>
+                <li><strong>Meter Testing:</strong> The bi-directional meter is procured and sent to the DISCOM laboratory for rigorous calibration testing.</li>
+                <li><strong>Commissioning:</strong> The DISCOM engineer visits your home, installs the meter, seals it, and officially synchronizes your plant with the grid.</li>
+            </ol>
+
+            <h2>The Golden Rule: Check Your Sanctioned Load</h2>
+            <p>Across almost all Indian states, there is one universal rule: <strong>You cannot install a solar system larger than your sanctioned electricity load.</strong></p>
+            <p>If your current electricity bill says your sanctioned load is 2kW, but you want to install a 3kW solar system to claim the maximum ₹78,000 subsidy, you must first apply to your DISCOM to increase your sanctioned load to 3kW. Always factor this minor upgrade fee (and the few days it takes to process) into your installation timeline.</p>
+
+            <p style="font-size: 0.9rem; color: #777; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;"><em>Disclaimer: State DISCOM rules, banking periods, and feed-in tariffs are subject to frequent regulatory changes. Always consult your official State Electricity Regulatory Commission (SERC) or your empaneled vendor for the precise, up-to-date 2026 regulations in your area.</em></p>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 8px; display: flex; align-items: center; gap: 15px; border: 1px solid #e0e0e0;">
+                <div style="width: 50px; height: 50px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0;">✓</div>
+                <div>
+                    <h4 style="margin: 0; color: var(--text-color); font-size: 1rem;">Fact-Checked & Verified</h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;">This guide was reviewed by our internal team of solar engineers and financial analysts to ensure compliance with the latest 2026 PM Surya Ghar and state DISCOM guidelines.</p>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a data-modal="about-modal">About Us</a>
+                <a data-modal="privacy-modal">Privacy Policy</a>
+                <a data-modal="terms-modal">Terms of Service</a>
+            </div>
+            <div class="support-us">
+                <a href="#" target="_blank" class="btn-coffee">☕ Buy Me A Coffee</a>
+            </div>
+            <p class="copyright">&copy; 2026 Solar ROI Calculator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="privacy-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Privacy Policy</h2><p>Welcome to Solar ROI Calculator. Your privacy is critically important to us. This Privacy Policy explains how we collect, use, and protect your information when you use our website.</p><p>We use third-party advertising companies, such as Google AdSense, to serve ads when you visit our website. These companies may use aggregated information about your visits to provide advertisements about goods and services of interest to you.</p></div></div>
+    </div>
+    <div id="terms-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Terms of Service</h2><p>By accessing and using Solar ROI Calculator, you accept and agree to be bound by the terms and provision of this agreement.</p><p><strong>Estimates Only:</strong> The calculations, recommendations, and articles provided by this application are estimates based on standard assumptions. They are for informational purposes only.</p></div></div>
+    </div>
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>About Us</h2><p>Solar ROI Calculator is an independent platform dedicated to helping Indian homeowners transition to renewable energy. We provide free, accurate, and up-to-date data on solar subsidies, costs, and technology.</p></div></div>
+    </div>
+
+    <div class="sticky-cta">
+        <a href="/index.html" class="btn-action">⚡ Calculate Your Subsidy Now</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const modalLinks = document.querySelectorAll('[data-modal]');
+            const modalCloses = document.querySelectorAll('.modal-close');
+            
+            if(modalLinks && modalCloses) {
+                Array.from(modalLinks).forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('data-modal');
+                        const target = document.getElementById(targetId);
+                        if (target) target.classList.add('active');
+                    });
+                });
+                Array.from(modalCloses).forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const overlay = btn.closest('.modal-overlay');
+                        if(overlay) overlay.classList.remove('active');
+                    });
+                });
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
