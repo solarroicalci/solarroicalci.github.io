@@ -50,6 +50,7 @@
         
         .input-group { margin-bottom: 25px; }
         .input-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        .pseudo-label { display: block; font-weight: 600; margin-bottom: 8px; }
         select, input[type="number"], input[type="text"], input[type="tel"] { 
             width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; 
         }
@@ -75,7 +76,7 @@
             background: var(--white); padding: 15px; border-radius: 8px; text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center;
         }
-        .result-box h3 { font-size: 0.9rem; color: #666; margin-bottom: 5px; }
+        .result-box h2 { font-size: 0.9rem; color: #666; margin-bottom: 5px; font-weight: bold; }
         .result-box p { font-size: 1.2rem; font-weight: bold; color: var(--text-color); }
         .result-box.highlight p { color: var(--secondary-color); }
         .result-box.focus p { color: var(--primary-color); font-size: 1.4rem; }
@@ -304,8 +305,8 @@
             <li><a href="#calculator">Calculator</a></li>
             <li><a href="#learn-more">About Solar</a></li>
             <li><a href="/blog/index.html">Blog</a></li>
-            <li><a data-modal="privacy-modal">Privacy Policy</a></li>
-            <li><a data-modal="contact-modal">Contact</a></li>
+            <li><a href="#" data-modal="privacy-modal">Privacy Policy</a></li>
+            <li><a href="#" data-modal="contact-modal">Contact</a></li>
         </ul>
     </nav>
 
@@ -359,10 +360,10 @@
                     </div>
 
                     <div class="input-group">
-                        <label>System Type:</label>
+                        <span class="pseudo-label">System Type:</span>
                         <div class="radio-group">
-                            <label><input type="radio" name="sysType" value="ongrid" checked> On-Grid (Subsidized)</label>
-                            <label><input type="radio" name="sysType" value="offgrid"> Off-Grid with Battery (No Subsidy)</label>
+                            <label for="sys-ongrid"><input type="radio" id="sys-ongrid" name="sysType" value="ongrid" checked> On-Grid (Subsidized)</label>
+                            <label for="sys-offgrid"><input type="radio" id="sys-offgrid" name="sysType" value="offgrid"> Off-Grid with Battery (No Subsidy)</label>
                         </div>
                         <div id="offgrid-warning" class="capacity-warning">Note: Government subsidies are only applicable for On-Grid systems. Batteries are not subsidized.</div>
                     </div>
@@ -371,7 +372,7 @@
                         <label for="billSlider">Average Monthly Electricity Bill (₹):</label>
                         <div class="slider-container">
                             <input type="range" id="billSlider" min="500" max="30000" step="100" value="2000">
-                            <input type="number" id="billInput" class="slider-input" min="500" max="30000" value="2000">
+                            <input type="number" id="billInput" class="slider-input" min="500" max="30000" value="2000" aria-label="Enter Average Monthly Electricity Bill">
                         </div>
                     </div>
 
@@ -379,35 +380,35 @@
                         <label for="roofSlider">Available Roof Space (sq. ft.):</label>
                         <div class="slider-container">
                             <input type="range" id="roofSlider" min="100" max="5000" step="50" value="500">
-                            <input type="number" id="roofInput" class="slider-input" min="100" max="5000" value="500">
+                            <input type="number" id="roofInput" class="slider-input" min="100" max="5000" value="500" aria-label="Enter Available Roof Space in square feet">
                         </div>
                     </div>
 
                     <div class="results-grid">
                         <div class="result-box">
-                            <h3>Recommended Size</h3>
+                            <h2>Recommended Size</h2>
                             <div style="color: #d9534f; font-size: 0.75rem; margin-top: 5px; margin-bottom: 5px; font-weight: 600;">* Max limit: Your Sanctioned Grid Load (e.g., 2kW load = 2kW max solar)</div>
                             <p id="res-size">-- kW</p>
                         </div>
                         <div class="result-box">
-                            <h3>Total Cost</h3>
+                            <h2>Total Cost</h2>
                             <p id="res-total">₹ --</p>
                         </div>
                         <div class="result-box highlight">
-                            <h3>Total Subsidy</h3>
+                            <h2>Total Subsidy</h2>
                             <p id="res-subsidy">₹ --</p>
                             <div id="subsidy-breakdown" class="subsidy-subtext">(Central: ₹0 | State: ₹0)</div>
                         </div>
                         <div class="result-box focus">
-                            <h3>Net Cost</h3>
+                            <h2>Net Cost</h2>
                             <p id="res-net">₹ --</p>
                         </div>
                         <div class="result-box focus-green">
-                            <h3>Payback Period</h3>
+                            <h2>Payback Period</h2>
                             <p id="res-roi">-- Years</p>
                         </div>
                         <div class="result-box">
-                            <h3>Estimated EMI (5 Yrs)</h3>
+                            <h2>Estimated EMI (5 Yrs)</h2>
                             <p id="res-emi">₹ --</p>
                             <div id="emi-indicator" class="emi-indicator"></div>
                         </div>
@@ -569,9 +570,9 @@
     <footer>
         <div class="container footer-content">
             <div class="footer-links">
-                <a data-modal="about-modal">About Us</a>
-                <a data-modal="privacy-modal">Privacy Policy</a>
-                <a data-modal="terms-modal">Terms of Service</a>
+                <a href="#" data-modal="about-modal">About Us</a>
+                <a href="#" data-modal="privacy-modal">Privacy Policy</a>
+                <a href="#" data-modal="terms-modal">Terms of Service</a>
             </div>
             <div class="support-us">
                 <a href="https://buymeacoffee.com/yourlink" target="_blank" class="btn-coffee">☕ Buy Me A Coffee</a>
