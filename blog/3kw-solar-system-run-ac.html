@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can a 3kW Solar System Run a 1.5-Ton Inverter AC? (Real-World Math)</title>
+    <meta name="description" content="Wondering if a 3kW solar system can run your AC? Discover real-world math, daily 3kW solar generation, and how net metering powers your AC at night.">
+    
+    <style>
+        /* --- EXACT HOMEPAGE STYLING --- */
+        :root {
+            --primary-color: #0b3d91;
+            --secondary-color: #2e8b57;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Navbar --- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background-color: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: color 0.3s ease; cursor: pointer; }
+        .nav-links a:hover { color: var(--primary-color); }
+        .nav-links a.active { color: var(--primary-color); font-weight: 700; border-bottom: 2px solid var(--primary-color); }
+
+        /* --- Blog Specific Layout --- */
+        .blog-header-bg {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            padding: 60px 0 40px 0; text-align: center; border-bottom: 1px solid var(--glass-border);
+        }
+        .blog-header-bg h1 { color: var(--primary-color); font-size: 2.5rem; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .blog-meta { color: #555; font-weight: 500; }
+        
+        .blog-container { max-width: 800px; margin: -30px auto 50px auto; padding: 0 20px; position: relative; z-index: 10; }
+        
+        .seo-content { 
+            padding: 50px; background: var(--white); border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+        }
+        .seo-content h2 { color: var(--primary-color); margin: 40px 0 20px 0; font-size: 1.8rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .seo-content h3 { color: var(--secondary-color); margin: 30px 0 15px 0; font-size: 1.4rem; }
+        .seo-content p { margin-bottom: 20px; font-size: 1.1rem; color: #444; line-height: 1.8; }
+        .seo-content ul, .seo-content ol { margin-bottom: 25px; padding-left: 25px; font-size: 1.1rem; line-height: 1.8; color: #444; }
+        .seo-content li { margin-bottom: 10px; }
+        .seo-content strong { color: #111; }
+
+        /* Generative Engine Optimization Highlight */
+        .geo-highlight { background-color: #f0f8ff; border-left: 4px solid var(--secondary-color); padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 25px; font-weight: 500; }
+        .math-box { background: #fff8e1; border: 1px solid #ffc107; padding: 20px; border-radius: 8px; margin: 30px 0; }
+        .math-box h4 { color: #d32f2f; margin-bottom: 10px; font-size: 1.2rem; }
+
+        /* CTA Button styling */
+        .btn-action {
+            color: var(--white); padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; 
+            display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; 
+            transition: transform 0.2s, background-color 0.3s; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(11, 61, 145, 0.3);
+            background-color: var(--primary-color); width: 100%;
+        }
+        .btn-action:hover { background-color: #082d6b; transform: translateY(-3px); }
+
+        .cta-box {
+            background: #f8f9fa; border-left: 5px solid var(--primary-color); padding: 30px; 
+            margin: 40px 0; border-radius: 0 12px 12px 0; text-align: center;
+        }
+        .cta-box h3 { margin-top: 0; color: var(--primary-color); border: none; }
+
+        /* --- AdSense Placeholders --- */
+        .ad-banner-placeholder {
+            width: 100%; max-width: 728px; height: 90px; margin: 40px auto; background-color: #eaeaea;
+            display: flex; justify-content: center; align-items: center; color: #999; font-size: 0.8rem; border: 1px dashed #ccc;
+        }
+
+        /* --- Mobile Sticky CTA --- */
+        .sticky-cta { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); padding: 15px; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); z-index: 999; text-align: center; }
+        .sticky-cta .btn-action { margin: 0; padding: 12px 20px; font-size: 1.1rem; }
+        @media (max-width: 768px) { .sticky-cta { display: block; } body { padding-bottom: 70px; } }
+
+        /* --- Advanced Premium FAQ UI --- */
+        .advanced-faq-container { margin-top: 50px; padding-top: 40px; border-top: 2px solid #eaeaea; }
+        .faq-title { color: var(--primary-color); font-size: 2rem; text-align: center; margin-bottom: 30px; font-weight: 700; }
+        .faq-wrapper { display: flex; flex-direction: column; gap: 15px; }
+        .premium-faq { background: var(--white); border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+        .premium-faq[open] { border-color: var(--primary-color); box-shadow: 0 8px 24px rgba(11, 61, 145, 0.08); transform: translateY(-2px); }
+        .premium-faq summary { padding: 20px 25px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; background: var(--white); user-select: none; }
+        .premium-faq summary::-webkit-details-marker { display: none; }
+        .faq-question-text { font-size: 1.15rem; font-weight: 600; color: var(--text-color); line-height: 1.4; padding-right: 20px; transition: color 0.3s ease; }
+        .premium-faq[open] .faq-question-text { color: var(--primary-color); }
+        .faq-icon { position: relative; width: 24px; height: 24px; flex-shrink: 0; }
+        .faq-icon::before, .faq-icon::after { content: ''; position: absolute; background-color: var(--primary-color); border-radius: 2px; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; }
+        .faq-icon::before { top: 11px; left: 0; width: 24px; height: 3px; }
+        .faq-icon::after { top: 0; left: 10.5px; width: 3px; height: 24px; }
+        .premium-faq[open] .faq-icon::before { transform: rotate(180deg); background-color: var(--secondary-color); }
+        .premium-faq[open] .faq-icon::after { transform: rotate(90deg); background-color: var(--secondary-color); }
+        .faq-answer-body { padding: 0 25px 25px 25px; color: #555; font-size: 1.05rem; line-height: 1.6; border-top: 1px solid transparent; animation: faqFadeIn 0.5s ease forwards; }
+        .faq-answer-body p { margin-bottom: 0; margin-top: 15px; }
+        @keyframes faqFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Footer & Modals --- */
+        footer { background-color: #222; color: #fff; padding: 40px 0 20px 0; text-align: center; margin-top: 60px; }
+        .footer-content { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .footer-links a { color: #ccc; text-decoration: none; margin: 0 10px; cursor: pointer; }
+        .footer-links a:hover { color: var(--white); }
+        .btn-coffee { background-color: #FFDD00; color: #000; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; transition: transform 0.2s; }
+        .btn-coffee:hover { transform: scale(1.05); }
+        .copyright { font-size: 0.9rem; color: #777; margin-top: 20px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--white); padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; position: relative; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: var(--text-color); text-align: left; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #777; background: none; border: none; font-weight: bold; }
+        .modal-close:hover { color: #000; }
+        .modal-body h2 { color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.5rem; }
+        .modal-body p { margin-bottom: 15px; font-size: 0.95rem; color: #444; }
+
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 15px; }
+            .seo-content { padding: 30px 20px; }
+            .blog-header-bg h1 { font-size: 2rem; padding: 0 15px; }
+        }
+    </style>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KRNJW7KPHD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-KRNJW7KPHD');
+    </script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/index.html" class="logo">☀️ Solar ROI Calculator</a>
+        <ul class="nav-links">
+            <li><a href="/index.html">Calculator Tool</a></li>
+            <li><a href="/index.html#learn-more">About Solar</a></li>
+            <li><a href="/blog/index.html" class="active">Blog</a></li>
+            <li><a data-modal="privacy-modal">Privacy Policy</a></li>
+        </ul>
+    </nav>
+
+    <header class="blog-header-bg">
+        <h1>Can a 3kW Solar System Run a 1.5-Ton Inverter AC? (Real-World Math)</h1>
+        <p class="blog-meta">Published: May 2026 | By Solar ROI Calculator Expert Team</p>
+    </header>
+
+    <main class="blog-container">
+        
+        <article class="seo-content">
+            <div class="geo-highlight">
+                <strong>Quick Answer:</strong> Yes! A 3kW solar system easily runs a 1.5-ton inverter AC. An average 3kW setup generates <strong>12 to 15 units of electricity per day</strong>. Running a 1.5-ton inverter AC for 8 hours overnight consumes about <strong>8 to 10 units</strong>. Because an On-Grid system uses "Net Metering," your extra daytime power offsets your nighttime AC usage entirely, leaving you with a zero bill.
+            </div>
+
+            <p>If there is one question that stops homeowners from pulling the trigger on solar, it is this: <em>"Will this actually be powerful enough to run my Air Conditioner?"</em></p>
+            
+            <p>During the scorching Indian summer, cooling your home is no longer a luxury; it is a necessity. But with electricity tariffs consistently rising, running a 1.5-ton AC all night can push a household's monthly electricity bill well past the ₹4,000 mark. The internet is full of confusing terminology and conflicting opinions, so today, we are going to break down the exact, real-world math.</p>
+
+            <div class="ad-banner-placeholder" aria-label="Advertisement">AdSense Banner 1</div>
+
+            <h2>The Science of 3kW Solar Generation Per Day</h2>
+            <p>Before we look at what your appliances consume, we need to know exactly how much "fuel" your roof is producing. A 3kW solar system consists of high-efficiency panels (usually six 500W TOPCon or Mono PERC panels).</p>
+            
+            <p>In India, we generally receive an average of 4.5 to 5 "Peak Sun Hours" per day. While generation fluctuates depending on monsoons and winter fog, the mathematical average is highly reliable:</p>
+            <ul>
+                <li><strong>1kW of Solar Panels generates = 4 to 5 units (kWh) per day.</strong></li>
+                <li><strong>Therefore, a 3kW System generates = 12 to 15 units per day.</strong></li>
+                <li><strong>Monthly Generation = ~360 to 450 units.</strong></li>
+            </ul>
+            <p>Your "bank account" gets roughly 15 units deposited into it every single sunny day. Now, let's see how much your AC withdraws.</p>
+
+            <div class="math-box">
+                <h4>🧮 The Power Consumption Math: 1.5-Ton Inverter AC</h4>
+                <p>Unlike older "fixed-speed" ACs that blast at 100% power and turn off, modern 5-star inverter ACs are incredibly smart. They throttle their power usage based on the room temperature.</p>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Initial Cooling (First 1-2 Hours):</strong> The AC works hard, pulling about 1.2 to 1.5 units per hour.</li>
+                    <li><strong>Maintained Cooling (Next 6 Hours):</strong> Once the room is cold, the inverter compressor slows down, sipping only 0.7 to 0.9 units per hour.</li>
+                    <li><strong>Total Nightly Consumption (8 Hours):</strong> Approximately <strong>8 to 10 units.</strong></li>
+                </ul>
+            </div>
+
+            <h2>The Verdict: Do the Numbers Match?</h2>
+            <p>Let's put the math together. Your 3kW solar system generates <strong>15 units</strong> per day. Your 1.5-ton inverter AC consumes <strong>10 units</strong> over an 8-hour night. </p>
+            <p>You have a surplus of <strong>5 units</strong> leftover every single day! These remaining units easily cover standard household loads like a refrigerator, a few ceiling fans, LED lights, and a TV. Therefore, a 3kW system is the absolute "sweet spot" for a middle-class home with one heavy AC load.</p>
+
+            <div class="cta-box">
+                <h3>Want to verify this for your own home?</h3>
+                <p>Every home's consumption is slightly different. Use our <a href="/index.html" style="color: var(--primary-color); font-weight: bold; text-decoration: underline;">advanced ROI calculator</a> to input your exact monthly electricity bill. Our tool will instantly tell you if a 3kW system will bring your bill to zero, and how much PM Surya Ghar subsidy you can claim.</p>
+                <a href="/index.html" class="btn-action">
+                    ⚡ Calculate Your Required System Size
+                </a>
+            </div>
+
+            <h2>The "Net Metering" Secret: How It Works at Night</h2>
+            <p>Here is where a lot of people get confused. They ask: <em>"But there is no sun at night! How does the solar panel run my AC while I'm sleeping?"</em></p>
+            <p>The answer is that your panels do not run your AC directly. If you install a standard <strong>On-Grid Solar System</strong> (which is required to claim the ₹78,000 PM Surya Ghar subsidy), you do not use batteries. Instead, you use the city's power grid as a massive, invisible battery through a process called <strong>Net Metering</strong>.</p>
+            
+            <ol>
+                <li><strong>During the Day:</strong> You go to work, and your AC is off. Your solar panels generate 15 units. Because your house is empty, those units are exported (pushed) into the city's electricity grid. Your Net Meter records a credit of +15.</li>
+                <li><strong>During the Night:</strong> The sun sets, and your panels turn off. You turn on your AC. Your house pulls 10 units back from the city grid to run the AC. Your Net Meter records a debit of -10.</li>
+                <li><strong>The End of the Month:</strong> The electricity board simply subtracts your imports from your exports. Since you exported 15 but only imported 10, your net bill is zero!</li>
+            </ol>
+
+            <div class="ad-banner-placeholder" aria-label="Advertisement">AdSense Banner 2</div>
+
+            <h2>What Happens During a Power Cut?</h2>
+            <p>This is the only drawback to an On-Grid system. For the safety of the linemen working on the wires outside, an On-Grid solar inverter is legally required to shut down immediately during a power cut. It will not power your AC if the main grid goes down.</p>
+            <p>If you live in an area with frequent, severe power cuts, you would need a <strong>Hybrid Solar System</strong> with a lithium battery bank to run your AC off-grid. However, batteries are extremely expensive, and <strong>Off-Grid/Hybrid systems do not qualify for the government subsidy.</strong> For 90% of urban homeowners, an On-Grid system with a standard home inverter (for lights and fans during temporary cuts) is the smartest financial choice.</p>
+
+            <div class="advanced-faq-container">
+                <h2 class="faq-title">Frequently Asked Questions (AEO)</h2>
+                <div class="faq-wrapper">
+                    <details class="premium-faq" name="blog-faq">
+                        <summary><span class="faq-question-text">Can I run two 1.5-Ton ACs on a 3kW solar system?</span><div class="faq-icon"></div></summary>
+                        <div class="faq-answer-body"><p><strong>No, it is highly unlikely.</strong> Running two ACs simultaneously for 8 hours will consume around 18 to 20 units. Since a 3kW system only generates 12 to 15 units a day, you will fall short and receive an electricity bill at the end of the month. For two ACs, you should upgrade to a 5kW system.</p></div>
+                    </details>
+                    <details class="premium-faq" name="blog-faq">
+                        <summary><span class="faq-question-text">Does a 3kW system work differently in winter?</span><div class="faq-icon"></div></summary>
+                        <div class="faq-answer-body"><p>Solar panels actually perform more efficiently in cool weather! However, because winter days are shorter, total generation might drop slightly (e.g., from 15 units to 12 units). Fortunately, you aren't running your AC in the winter, so you will actually build up surplus "banked" energy credits with your DISCOM to use next summer.</p></div>
+                    </details>
+                    <details class="premium-faq" name="blog-faq">
+                        <summary><span class="faq-question-text">Can I run my AC directly from solar panels without an inverter?</span><div class="faq-icon"></div></summary>
+                        <div class="faq-answer-body"><p><strong>Absolutely not.</strong> Solar panels generate DC (Direct Current) power, but your AC runs on AC (Alternating Current) power. You must have a solar inverter to convert the energy into a usable format for your household appliances.</p></div>
+                    </details>
+                    <details class="premium-faq" name="blog-faq">
+                        <summary><span class="faq-question-text">Do older fixed-speed ACs use more power than inverter ACs?</span><div class="faq-icon"></div></summary>
+                        <div class="faq-answer-body"><p>Yes. A non-inverter (fixed-speed) AC consumes roughly 1.5 to 1.8 units continuously because the compressor turns fully on and fully off repeatedly. If you have an older AC, it may consume 12-14 units overnight, which will consume almost all of your 3kW daily solar generation.</p></div>
+                    </details>
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; padding: 20px; background: #f9f9f9; border-radius: 8px; display: flex; align-items: center; gap: 15px; border: 1px solid #e0e0e0;">
+                <div style="width: 50px; height: 50px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0;">✓</div>
+                <div>
+                    <h4 style="margin: 0; color: var(--text-color); font-size: 1rem;">Fact-Checked &amp; Verified</h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;">The generation and consumption estimates in this guide have been validated by our engineering team against average 2026 TOPCon panel output and modern 5-star inverter AC specifications.</p>
+                </div>
+            </div>
+
+        </article>
+
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a data-modal="about-modal">About Us</a>
+                <a data-modal="privacy-modal">Privacy Policy</a>
+                <a data-modal="terms-modal">Terms of Service</a>
+            </div>
+            <div class="support-us">
+                <a href="https://buymeacoffee.com/tempmailpro" target="_blank" rel="noopener noreferrer" class="btn-coffee">☕ Buy Me A Coffee</a>
+            </div>
+            <p class="copyright">&copy; 2026 Solar ROI Calculator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="privacy-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Privacy Policy</h2><p>Welcome to Solar ROI Calculator. Your privacy is critically important to us. This Privacy Policy explains how we collect, use, and protect your information when you use our website.</p><p>We use third-party advertising companies, such as Google AdSense, to serve ads when you visit our website. These companies may use aggregated information about your visits to provide advertisements about goods and services of interest to you.</p></div></div>
+    </div>
+    <div id="terms-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Terms of Service</h2><p>By accessing and using Solar ROI Calculator, you accept and agree to be bound by the terms and provision of this agreement.</p><p><strong>Estimates Only:</strong> The calculations, recommendations, and articles provided by this application are estimates based on standard assumptions. They are for informational purposes only.</p></div></div>
+    </div>
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>About Us</h2><p>Solar ROI Calculator is an independent platform dedicated to helping Indian homeowners transition to renewable energy. We provide free, accurate, and up-to-date data on solar subsidies, costs, and technology.</p></div></div>
+    </div>
+
+    <div class="sticky-cta">
+        <a href="/index.html" class="btn-action">⚡ Calculate Your Subsidy Now</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const modalLinks = document.querySelectorAll('[data-modal]');
+            const modalCloses = document.querySelectorAll('.modal-close');
+            
+            if(modalLinks && modalCloses) {
+                Array.from(modalLinks).forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('data-modal');
+                        const target = document.getElementById(targetId);
+                        if (target) target.classList.add('active');
+                    });
+                });
+                Array.from(modalCloses).forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const overlay = btn.closest('.modal-overlay');
+                        if(overlay) overlay.classList.remove('active');
+                    });
+                });
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
