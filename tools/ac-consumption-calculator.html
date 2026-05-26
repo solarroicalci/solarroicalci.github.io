@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC Power Consumption & Electricity Bill Calculator 2026</title>
+    <meta name="description" content="Calculate your exact daily and monthly AC electricity bill in INR or USD. Compare Window vs Split AC, Inverter vs Non-Inverter, and power units (kWh) consumed.">
+    <link rel="canonical" href="https://solarroi.xyz/tools/ac-consumption-calculator.html" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- BRAND VARIABLES --- */
+        :root {
+            --primary-color: #0b3d91;
+            --secondary-color: #2e8b57;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- NAVBAR --- */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background-color: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: color 0.3s ease; cursor: pointer; }
+        .nav-links a:hover { color: var(--primary-color); }
+        .nav-links a.active { color: var(--primary-color); font-weight: 700; border-bottom: 2px solid var(--primary-color); }
+
+        /* --- PREMIUM DARK TEXTURED HERO SECTION --- */
+        .hero-section {
+            padding: 60px 0;
+            background-color: #0a0f1a;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                radial-gradient(circle at 50% 0%, rgba(11, 61, 145, 0.4) 0%, transparent 70%);
+            background-size: 32px 32px, 32px 32px, 100% 100%;
+            background-position: center top;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-panel { 
+            background: var(--glass-bg); 
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            border-radius: 16px; 
+            padding: 40px; 
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); 
+            position: relative; 
+            z-index: 10; 
+        }
+        
+        .calculator-header { text-align: center; margin-bottom: 40px; }
+        .calculator-header h1 { 
+            font-size: 2.4rem; 
+            margin-bottom: 10px; 
+            font-weight: 800;
+            background: linear-gradient(135deg, #0b3d91 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .calc-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
+        @media (max-width: 768px) { .calc-grid { grid-template-columns: 1fr; } .navbar { flex-direction: column; gap: 15px; } }
+
+        /* --- INPUTS --- */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #222; }
+        select, input[type="range"] { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; background: #f9fafb; transition: border-color 0.3s; cursor: pointer; }
+        select:focus { outline: none; border-color: var(--primary-color); }
+        
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .slider-value { font-weight: bold; color: var(--primary-color); background: #e0f7fa; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; }
+
+        /* --- RESULTS PANEL --- */
+        .results-panel { background: #f8fafc; border-radius: 12px; padding: 25px; border: 1px solid #e2e8f0; }
+        .results-grid-internal { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .res-box { background: var(--white); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #e2e8f0; }
+        .res-box h3 { font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .res-box p { font-size: 1.4rem; font-weight: 700; color: var(--text-color); }
+        .res-box.highlight p { color: #ef4444; }
+        
+        .chart-container { position: relative; width: 100%; height: 250px; margin-top: 20px; }
+
+        /* --- PREMIUM CTA BOX --- */
+        .solar-cta { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0b3d91 100%);
+            color: white; 
+            border-radius: 16px; 
+            padding: 30px; 
+            text-align: center; 
+            margin-top: 30px; 
+            box-shadow: 0 15px 35px rgba(11, 61, 145, 0.25);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .solar-cta::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%); animation: pulseGlow 8s ease-in-out infinite alternate; pointer-events: none; }
+        @keyframes pulseGlow { 0% { transform: scale(1) translate(0, 0); } 100% { transform: scale(1.1) translate(2%, 2%); } }
+        .solar-badge { display: inline-block; background: var(--secondary-color); color: white; padding: 8px 16px; border-radius: 30px; font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; position: relative; z-index: 2; }
+        .solar-cta p, .solar-cta h3 { position: relative; z-index: 2; }
+        
+        .btn-action-light { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); color: var(--primary-color); padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: 800; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; z-index: 2; }
+        .btn-action-light:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); color: #1e3a8a; }
+
+        /* --- SEO CONTENT & ADS --- */
+        .ad-banner-placeholder { width: 100%; max-width: 728px; height: 90px; margin: 40px auto; background-color: #eaeaea; display: flex; justify-content: center; align-items: center; color: #999; font-size: 0.8rem; border: 1px dashed #ccc; }
+        .seo-content { padding: 50px 20px; background: var(--white); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-top: -30px; position: relative; z-index: 10; }
+        .seo-content h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 1.8rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .seo-content h3 { color: var(--secondary-color); margin: 30px 0 15px 0; font-size: 1.4rem; }
+        .seo-content p { margin-bottom: 18px; font-size: 1.05rem; color: #444; }
+        .premium-faq { background: var(--white); border: 1px solid #e0e0e0; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+        .premium-faq[open] { border-color: var(--primary-color); box-shadow: 0 4px 15px rgba(11, 61, 145, 0.05); }
+        .premium-faq summary { padding: 20px; font-weight: 600; cursor: pointer; list-style: none; display: flex; justify-content: space-between; font-size: 1.1rem; color: var(--text-color); }
+        .premium-faq summary::-webkit-details-marker { display: none; }
+        .faq-answer-body { padding: 0 20px 20px; color: #555; }
+
+        /* --- PROFESSIONAL FOOTER & MODALS --- */
+        footer { background-color: #222; color: #fff; padding: 40px 0 20px 0; text-align: center; margin-top: 60px; }
+        .footer-content { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .footer-links a { color: #ccc; text-decoration: none; margin: 0 10px; cursor: pointer; }
+        .footer-links a:hover { color: var(--white); }
+        .btn-coffee { background-color: #FFDD00; color: #000; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; transition: transform 0.2s; }
+        .btn-coffee:hover { transform: scale(1.05); }
+        .copyright { font-size: 0.9rem; color: #777; margin-top: 20px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--white); padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; position: relative; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: var(--text-color); text-align: left; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #777; background: none; border: none; font-weight: bold; }
+        .modal-close:hover { color: #000; }
+        .modal-body h2 { color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.5rem; }
+        .modal-body p { margin-bottom: 15px; font-size: 0.95rem; color: #444; }
+    </style>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "AC Power Consumption & Bill Calculator",
+          "operatingSystem": "Web",
+          "applicationCategory": "UtilitiesApplication",
+          "description": "Calculate exact daily and monthly electricity bills and power consumption units for Split and Window ACs worldwide.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How many units does a 1.5-ton AC consume in 8 hours?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A modern 1.5-ton highly efficient split inverter AC set at 24°C consumes about 1.1 units (kWh) per hour. Running it for 8 hours consumes approximately 8.8 to 9 units of electricity per day." }
+            },
+            {
+              "@type": "Question",
+              "name": "Which consumes more electricity: Window AC or Split AC?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Window ACs generally consume about 5% to 10% more electricity than Split ACs of the same tonnage. Split ACs have more advanced, larger compressors and better airflow distribution, making them more energy-efficient." }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/index.html" class="logo">☀️ Solar ROI Calculator</a>
+        <ul class="nav-links">
+            <li><a href="/index.html">Solar ROI</a></li>
+            <li><a href="/tools/ac-consumption-calculator.html" class="active">More Calculators</a></li>
+            <li><a href="/index.html#learn-more">About Solar</a></li>
+            <li><a href="/blog/index.html">Blog</a></li>
+            <li><a data-modal="contact-modal">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container">
+            <div class="glass-panel">
+                <div class="calculator-header">
+                    <h1>AC Power Consumption & Bill Calculator</h1>
+                    <p style="color: #555;">Calculate precise electricity units (kWh) and running costs for any AC configuration globally.</p>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="calc-inputs">
+                        <div class="input-group">
+                            <label for="currency-select">Select Currency</label>
+                            <select id="currency-select">
+                                <option value="INR" selected>INR (₹) - Indian Rupees</option>
+                                <option value="USD">USD ($) - US Dollars</option>
+                            </select>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="input-group">
+                                <label for="ac-ton">1. Capacity (Tonnage)</label>
+                                <select id="ac-ton">
+                                    <option value="1.0">1.0 Ton (Small Room)</option>
+                                    <option value="1.5" selected>1.5 Ton (Medium Room)</option>
+                                    <option value="2.0">2.0 Ton (Large Room)</option>
+                                    <option value="3.0">3.0 Ton (Light Commercial)</option>
+                                    <option value="4.0">4.0 Ton (Commercial)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="ac-style">2. AC Type</label>
+                                <select id="ac-style">
+                                    <option value="1.0" selected>Split AC</option>
+                                    <option value="1.08">Window AC</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="input-group">
+                                <label for="ac-tech">3. Technology</label>
+                                <select id="ac-tech">
+                                    <option value="1.0">Non-Inverter</option>
+                                    <option value="0.75" selected>Standard Inverter</option>
+                                    <option value="0.65">Dual/Twin Inverter</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="ac-star">4. Efficiency Rating</label>
+                                <select id="ac-star">
+                                    <option value="1.2">Low Efficiency (1-2 Star)</option>
+                                    <option value="1.0">Average (3 Star)</option>
+                                    <option value="0.9">High Efficiency (4 Star)</option>
+                                    <option value="0.8" selected>Ultra Efficient (5 Star)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label style="margin:0;">5. Temperature Setting</label>
+                                <span class="slider-value"><span id="temp-display">24</span>°C</span>
+                            </div>
+                            <input type="range" id="temp-slider" min="18" max="28" value="24">
+                            <p style="font-size: 0.8rem; color: #777; margin-top: 5px;">*BEE & Global agencies recommend 24°C for max savings.</p>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label style="margin:0;">6. Daily Usage</label>
+                                <span class="slider-value"><span id="hours-display">8</span> Hours</span>
+                            </div>
+                            <input type="range" id="hours-slider" min="1" max="24" value="8">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label style="margin:0;">7. Electricity Tariff</label>
+                                <span class="slider-value"><span id="sym-tariff">₹</span><span id="tariff-display">7.5</span> / Unit</span>
+                            </div>
+                            <input type="range" id="tariff-slider" min="3" max="15" step="0.5" value="7.5">
+                        </div>
+                    </div>
+
+                    <div class="results-panel">
+                        <div class="results-grid-internal">
+                            <div class="res-box">
+                                <h3>Daily Units (kWh)</h3>
+                                <p><span id="res-daily-units">0</span></p>
+                            </div>
+                            <div class="res-box">
+                                <h3>Daily Cost</h3>
+                                <p><span id="sym-daily">₹</span><span id="res-daily">0</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="results-grid-internal">
+                            <div class="res-box">
+                                <h3>Monthly Units (kWh)</h3>
+                                <p><span id="res-units">0</span></p>
+                            </div>
+                            <div class="res-box highlight">
+                                <h3>Monthly Bill</h3>
+                                <p><span id="sym-monthly">₹</span><span id="res-monthly">0</span></p>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="costChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="solar-cta">
+                    <h3>Stop paying this high AC bill.</h3>
+                    <p style="margin-bottom: 20px;">To run this AC 100% free using renewable energy, you need approximately:</p>
+                    <div class="solar-badge"><span id="res-solar-offset">--</span> kW Solar System</div>
+                    <br>
+                    <a href="/index.html" class="btn-action-light">Calculate Your Solar Savings →</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div class="ad-banner-placeholder">AdSense Banner 1 (728x90)</div>
+
+    <main class="container">
+        <article class="seo-content">
+            <h2>Understanding AC Power Units (kWh) & Consumption</h2>
+            <p>During the intense summer months, Air Conditioners are responsible for 40% to 60% of a standard household's electricity bill. Understanding exactly how to calculate your AC's wattage and daily electricity units (kWh) is the first step to reducing your monthly expenses. Our universal AC power consumption and electricity bill calculator uses official energy efficiency standards to provide highly accurate running cost estimates based on your specific cooling capacity and local electricity tariff.</p>
+
+            <h3>Window AC vs. Split AC: Electricity Bill Impact</h3>
+            <p>A common question is whether a Window AC consumes more power than a Split AC. The answer is yes. Because Window ACs are compact, their compressors and condenser coils are forced into a smaller physical space, making heat dissipation slightly less efficient. On average, a Window AC will consume 5% to 10% more electricity (units) than a Split AC of the exact same tonnage and star rating.</p>
+
+            <h3>Inverter vs. Non-Inverter Compressors</h3>
+            <p>The technology inside your AC's compressor drastically changes your monthly bill. A standard 1.5-ton non-inverter (fixed speed) AC draws a constant 1,500 to 1,800 watts. It runs at 100% capacity until the room cools, then shuts off completely. This constant start-stop cycle consumes massive amounts of electricity units.</p>
+            <p>Conversely, an Inverter AC adjusts its compressor speed dynamically based on the room's heat load. While a 1.5-ton basic efficiency non-inverter consumes around 1.5 units (kWh) per hour, a modern highly efficient Inverter AC drops to approximately 1.05 units per hour once the room stabilizes, saving you 30% to 40% on electricity.</p>
+
+            <h3>The "24°C" Rule for Maximum Savings</h3>
+            <p>The single biggest factor in AC power consumption is your thermostat setting. Agencies like the Bureau of Energy Efficiency (BEE) strongly recommend setting your AC to 24°C. For every degree you lower the temperature below 24°C, your AC consumes approximately 6% to 8% more electricity. Running your AC at 18°C can cost up to 36% more than running it at a comfortable, energy-efficient temperature.</p>
+
+            <div class="ad-banner-placeholder">AdSense Banner 2 (In-Article)</div>
+
+            <h2 style="margin-top: 40px;">Frequently Asked Questions (People Also Ask)</h2>
+            
+            <details class="premium-faq" open>
+                <summary>How many units does a 1.5-ton AC use in 8 hours?</summary>
+                <div class="faq-answer-body">A modern 1.5-ton highly efficient split inverter AC consumes roughly 1.05 units (kWh) per hour. Running it for 8 hours overnight consumes about 8.4 to 8.8 units of electricity. A standard 3-star non-inverter Window model would consume about 12 units for the same duration.</div>
+            </details>
+
+            <details class="premium-faq">
+                <summary>Should I leave the AC on all day or turn it off while away?</summary>
+                <div class="faq-answer-body">It is generally more cost-effective to turn your AC off when you leave the house for more than a few hours. For shorter trips (under 2 hours), simply raising the thermostat to 28°C prevents the compressor from working hard while still removing indoor humidity, which is cheaper than cooling a hot room from scratch when you return.</div>
+            </details>
+            
+            <details class="premium-faq">
+                <summary>3-Star vs 5-Star AC: How much money do you actually save?</summary>
+                <div class="faq-answer-body">Upgrading to a 5-Star ultra-efficient AC offers significant savings. For a 1.5-ton AC running 8 hours a day, a 3-star model consumes considerably more power over a month compared to a 5-star model. This means a high-efficiency AC saves you substantial amounts on your utility bill every month, easily covering its higher upfront purchase price within a couple of years.</div>
+            </details>
+
+            <details class="premium-faq">
+                <summary>How can I run my AC on a rooftop Solar System?</summary>
+                <div class="faq-answer-body">Matching an AC load with an On-Grid solar system is highly efficient. A 1.5-ton highly efficient AC running 8 hours daily consumes around 252 units a month. Since a 1kW solar system generates approximately 120 units monthly, you would need roughly a 2kW to 2.5kW solar addition to completely offset your summer cooling costs via Net Metering.</div>
+            </details>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a data-modal="about-modal">About Us</a>
+                <a href="/tools/ac-consumption-calculator.html">More Calculators</a>
+                <a data-modal="privacy-modal">Privacy Policy</a>
+                <a data-modal="terms-modal">Terms of Service</a>
+            </div>
+            <div class="support-us">
+                <a href="https://buymeacoffee.com/tempmailpro" target="_blank" rel="noopener noreferrer" class="btn-coffee">☕ Buy Me A Coffee</a>
+            </div>
+            <p class="copyright">&copy; 2026 Solar ROI Calculator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="privacy-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Privacy Policy</h2><p>Welcome to Solar ROI Calculator. Your privacy is critically important to us. This Privacy Policy explains how we collect, use, and protect your information when you use our website.</p><p>We use third-party advertising companies, such as Google AdSense, to serve ads when you visit our website. These companies may use aggregated information about your visits to provide advertisements about goods and services of interest to you.</p></div></div>
+    </div>
+    <div id="terms-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Terms of Service</h2><p>By accessing and using Solar ROI Calculator, you accept and agree to be bound by the terms and provision of this agreement.</p><p><strong>Estimates Only:</strong> The calculations, recommendations, and results provided by this application are estimates based on standard assumptions and current government guidelines. They are for informational purposes only.</p><p><strong>No Financial Liability:</strong> Solar ROI Calculator shall not be responsible or liable for the accuracy, usefulness or availability of any information transmitted via the site.</p></div></div>
+    </div>
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>About Us</h2><p>Solar ROI Calculator is an independent platform dedicated to helping Indian homeowners transition to renewable energy. We provide free, accurate, and up-to-date data on solar subsidies, costs, and technology.</p></div></div>
+    </div>
+    <div id="contact-modal" class="modal-overlay">
+        <div class="modal-content"><button class="modal-close">&times;</button><div class="modal-body"><h2>Contact Us</h2><p>For inquiries, partnership opportunities, or feedback, please reach out to us at: <strong>creationsdigitalai@gmail.com</strong></p></div></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Modal Logic
+            const modalLinks = document.querySelectorAll('[data-modal]');
+            const modalCloses = document.querySelectorAll('.modal-close');
+            
+            if(modalLinks && modalCloses) {
+                Array.from(modalLinks).forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('data-modal');
+                        const target = document.getElementById(targetId);
+                        if (target) target.classList.add('active');
+                    });
+                });
+                Array.from(modalCloses).forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const overlay = btn.closest('.modal-overlay');
+                        if(overlay) overlay.classList.remove('active');
+                    });
+                });
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
+                });
+            }
+
+            // Calculator Logic
+            const inputs = ['currency-select', 'ac-ton', 'ac-style', 'ac-tech', 'ac-star', 'temp-slider', 'hours-slider', 'tariff-slider'];
+            const currencySelect = document.getElementById('currency-select');
+            const tariffSlider = document.getElementById('tariff-slider');
+            
+            let chartInstance = null;
+
+            currencySelect.addEventListener('change', (e) => {
+                const currency = e.target.value;
+                if (currency === 'INR') {
+                    tariffSlider.min = 3;
+                    tariffSlider.max = 15;
+                    tariffSlider.step = 0.5;
+                    tariffSlider.value = 7.5;
+                } else if (currency === 'USD') {
+                    tariffSlider.min = 0.05;
+                    tariffSlider.max = 1.00;
+                    tariffSlider.step = 0.01;
+                    tariffSlider.value = 0.15;
+                }
+                calculateAC();
+            });
+
+            function calculateAC() {
+                const currency = currencySelect.value;
+                const ton = parseFloat(document.getElementById('ac-ton').value);
+                const styleMult = parseFloat(document.getElementById('ac-style').value);
+                const techMult = parseFloat(document.getElementById('ac-tech').value);
+                const starMult = parseFloat(document.getElementById('ac-star').value);
+                const temp = parseInt(document.getElementById('temp-slider').value);
+                const hours = parseInt(document.getElementById('hours-slider').value);
+                const tariff = parseFloat(document.getElementById('tariff-slider').value);
+
+                const curSym = currency === 'INR' ? '₹' : '$';
+                const curLoc = currency === 'INR' ? 'en-IN' : 'en-US';
+                const tariffDecimals = currency === 'INR' ? 1 : 2;
+
+                document.getElementById('sym-tariff').innerText = curSym;
+                document.getElementById('sym-daily').innerText = curSym;
+                document.getElementById('sym-monthly').innerText = curSym;
+                
+                document.getElementById('temp-display').innerText = temp;
+                document.getElementById('hours-display').innerText = hours;
+                document.getElementById('tariff-display').innerText = tariff.toFixed(tariffDecimals);
+
+                const baseKwPerTon = 1.1; 
+                const tempDiff = 24 - temp;
+                const tempMult = 1 + (tempDiff * 0.06);
+
+                const activeKw = ton * baseKwPerTon * styleMult * techMult * starMult * tempMult;
+
+                const dailyUnits = activeKw * hours;
+                const monthlyUnits = dailyUnits * 30;
+                
+                const dailyCost = dailyUnits * tariff;
+                const monthlyCost = monthlyUnits * tariff;
+
+                let solarRequired = monthlyUnits / 120;
+                solarRequired = Math.max(1, Math.round(solarRequired * 2) / 2); 
+
+                document.getElementById('res-daily-units').innerText = dailyUnits.toFixed(1);
+                document.getElementById('res-units').innerText = monthlyUnits.toFixed(0);
+                
+                document.getElementById('res-daily').innerText = dailyCost.toLocaleString(curLoc, { minimumFractionDigits: tariffDecimals, maximumFractionDigits: tariffDecimals });
+                document.getElementById('res-monthly').innerText = monthlyCost.toLocaleString(curLoc, { minimumFractionDigits: tariffDecimals, maximumFractionDigits: tariffDecimals });
+                
+                document.getElementById('res-solar-offset').innerText = solarRequired.toFixed(1);
+
+                updateChart(monthlyCost, curSym, curLoc);
+            }
+
+            function updateChart(monthlyCost, curSym, curLoc) {
+                const canvas = document.getElementById('costChart');
+                if (!canvas || typeof Chart === 'undefined') return;
+                const ctx = canvas.getContext('2d');
+
+                const yearlyCost = monthlyCost * 6; 
+                const cumulativeCosts = [ yearlyCost, yearlyCost*2, yearlyCost*3, yearlyCost*4, yearlyCost*5 ];
+
+                if (chartInstance) chartInstance.destroy();
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                        datasets: [{
+                            label: 'Cumulative Electricity Bill',
+                            data: cumulativeCosts,
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, title: { display: true, text: '5-Year Electricity Bill Projection' } },
+                        scales: { 
+                            y: { 
+                                beginAtZero: true, 
+                                ticks: { callback: function(val) { return curSym + val.toLocaleString(curLoc); } } 
+                            } 
+                        }
+                    }
+                });
+            }
+
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if(el.tagName === 'SELECT') el.addEventListener('change', calculateAC);
+                else el.addEventListener('input', calculateAC);
+            });
+
+            calculateAC();
+        });
+    </script>
+</body>
+</html>
