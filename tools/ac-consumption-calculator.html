@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AC Power Consumption & Electricity Bill Calculator 2026</title>
     <meta name="description" content="Calculate your exact daily and monthly AC electricity bill in INR or USD. Compare Window vs Split AC, Inverter vs Non-Inverter, and power units (kWh) consumed.">
     <link rel="canonical" href="https://solarroi.xyz/tools/ac-consumption-calculator.html" />
@@ -28,7 +28,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* --- BRAND VARIABLES --- */
+        /* --- BRAND VARIABLES & RESETS --- */
         :root {
             --primary-color: #0b3d91;
             --secondary-color: #2e8b57;
@@ -39,14 +39,27 @@
             --glass-border: rgba(255, 255, 255, 0.4);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        /* Prevent Horizontal Scroll Globally */
+        html, body { 
+            overflow-x: hidden; 
+            width: 100%; 
+            position: relative; 
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        }
+
         body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .container { width: 100%; max-width: 1000px; margin: 0 auto; padding: 0 15px; }
 
         /* --- NAVBAR --- */
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background-color: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; }
-        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links { list-style: none; display: flex; gap: 20px; flex-wrap: wrap; }
         .nav-links a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: color 0.3s ease; cursor: pointer; }
         .nav-links a:hover { color: var(--primary-color); }
         .nav-links a.active { color: var(--primary-color); font-weight: 700; border-bottom: 2px solid var(--primary-color); }
@@ -63,6 +76,7 @@
             background-position: center top;
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
         
         .glass-panel { 
@@ -72,7 +86,9 @@
             padding: 40px; 
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); 
             position: relative; 
-            z-index: 10; 
+            z-index: 10;
+            width: 100%;
+            overflow: hidden; /* Contains internal bleed */
         }
         
         .calculator-header { text-align: center; margin-bottom: 40px; }
@@ -86,28 +102,51 @@
             letter-spacing: -0.5px;
         }
 
-        .calc-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
+        .calc-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; width: 100%; }
         
-        .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        /* Fix for Grid blow-out caused by Chart.js */
+        .calc-inputs, .results-panel { min-width: 0; width: 100%; } 
+        
+        .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
 
         /* --- INPUTS --- */
-        .input-group { margin-bottom: 20px; }
+        .input-group { margin-bottom: 20px; width: 100%; }
         .input-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #222; }
-        select, input[type="range"] { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; background: #f9fafb; transition: border-color 0.3s; cursor: pointer; }
+        
+        select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            background: #f9fafb; 
+            transition: border-color 0.3s; 
+            cursor: pointer; 
+            max-width: 100%;
+        }
         select:focus { outline: none; border-color: var(--primary-color); }
         
-        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .slider-value { font-weight: bold; color: var(--primary-color); background: #e0f7fa; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; }
+        /* Fixed Range Slider styling to prevent mobile overflow */
+        input[type="range"] { 
+            width: 100%; 
+            margin: 15px 0; 
+            cursor: pointer; 
+            accent-color: var(--primary-color);
+            max-width: 100%;
+        }
+        
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+        .slider-value { font-weight: bold; color: var(--primary-color); background: #e0f7fa; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; white-space: nowrap; }
 
         /* --- RESULTS PANEL --- */
         .results-panel { background: #f8fafc; border-radius: 12px; padding: 25px; border: 1px solid #e2e8f0; }
-        .results-grid-internal { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .res-box { background: var(--white); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #e2e8f0; }
+        .results-grid-internal { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; width: 100%; }
+        .res-box { background: var(--white); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #e2e8f0; width: 100%; }
         .res-box h3 { font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .res-box p { font-size: 1.4rem; font-weight: 700; color: var(--text-color); }
+        .res-box p { font-size: 1.4rem; font-weight: 700; color: var(--text-color); word-break: break-word; }
         .res-box.highlight p { color: #ef4444; }
         
-        .chart-container { position: relative; width: 100%; height: 250px; margin-top: 20px; }
+        .chart-container { position: relative; width: 100%; max-width: 100%; height: 250px; margin-top: 20px; overflow: hidden; }
 
         /* --- PREMIUM CTA BOX --- */
         .solar-cta { 
@@ -127,13 +166,13 @@
         .solar-badge { display: inline-block; background: var(--secondary-color); color: white; padding: 8px 16px; border-radius: 30px; font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; position: relative; z-index: 2; }
         .solar-cta p, .solar-cta h3 { position: relative; z-index: 2; }
         
-        .btn-action-light { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); color: var(--primary-color); padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: 800; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; z-index: 2; }
+        .btn-action-light { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); color: var(--primary-color); padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: 800; display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; z-index: 2; white-space: nowrap; }
         .btn-action-light:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); color: #1e3a8a; }
 
         /* --- SEO CONTENT & ADS --- */
-        .ad-banner-placeholder { width: 100%; max-width: 728px; height: 90px; min-height: 90px; margin: 40px auto; background-color: #eaeaea; display: flex; justify-content: center; align-items: center; color: #999; font-size: 0.8rem; border: 1px dashed #ccc; }
+        .ad-banner-placeholder { width: 100%; max-width: 728px; height: 90px; min-height: 90px; margin: 40px auto; background-color: #eaeaea; display: flex; justify-content: center; align-items: center; color: #999; font-size: 0.8rem; border: 1px dashed #ccc; box-sizing: border-box; }
         
-        .seo-content { padding: 50px 20px; background: var(--white); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-top: -30px; position: relative; z-index: 10; }
+        .seo-content { padding: 50px 20px; background: var(--white); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-top: -30px; position: relative; z-index: 10; width: 100%; }
         .seo-content h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 1.8rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .seo-content h3 { color: var(--secondary-color); margin: 30px 0 15px 0; font-size: 1.4rem; }
         .seo-content p { margin-bottom: 18px; font-size: 1.05rem; color: #444; }
@@ -144,9 +183,10 @@
         .faq-answer-body { padding: 0 20px 20px; color: #555; }
 
         /* --- PROFESSIONAL FOOTER & MODALS --- */
-        footer { background-color: #222; color: #fff; padding: 40px 0 20px 0; text-align: center; margin-top: 60px; }
+        footer { background-color: #222; color: #fff; padding: 40px 0 20px 0; text-align: center; margin-top: 60px; width: 100%; }
         .footer-content { display: flex; flex-direction: column; gap: 20px; align-items: center; }
-        .footer-links a { color: #ccc; text-decoration: none; margin: 0 10px; cursor: pointer; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .footer-links a { color: #ccc; text-decoration: none; cursor: pointer; }
         .footer-links a:hover { color: var(--white); }
         .btn-coffee { background-color: #FFDD00; color: #000; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; transition: transform 0.2s; }
         .btn-coffee:hover { transform: scale(1.05); }
@@ -160,16 +200,17 @@
         .modal-body h2 { color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.5rem; }
         .modal-body p { margin-bottom: 15px; font-size: 0.95rem; color: #444; }
 
-        /* --- MOBILE RESPONSIVENESS FIXES --- */
+        /* --- STRICT MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) { 
             .calc-grid { grid-template-columns: 1fr; gap: 20px; } 
-            .navbar { flex-direction: column; gap: 15px; padding: 15px 20px; text-align: center; } 
-            .nav-links { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .navbar { flex-direction: column; gap: 15px; padding: 15px; text-align: center; } 
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 12px; font-size: 0.95rem; }
             .hero-section { padding: 30px 0; }
-            .glass-panel { padding: 20px 15px; } /* Reduced padding for more horizontal room */
-            .calculator-header h1 { font-size: 1.8rem; }
-            .two-col-grid { grid-template-columns: 1fr; } /* Stack internal inputs */
-            .results-grid-internal { grid-template-columns: 1fr; } /* Stack results on small screens */
+            .glass-panel { padding: 25px 15px; } /* Ensures left/right spacing remains identical */
+            .calculator-header h1 { font-size: 1.7rem; line-height: 1.2; }
+            .two-col-grid { grid-template-columns: 1fr; gap: 15px; } /* Stacks inputs vertically */
+            .results-grid-internal { grid-template-columns: 1fr; gap: 15px; } /* Stacks results vertically */
+            .results-panel { padding: 20px 15px; }
             .modal-content { padding: 20px; }
         }
     </style>
