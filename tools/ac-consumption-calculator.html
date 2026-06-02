@@ -87,7 +87,8 @@
         }
 
         .calc-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
-        @media (max-width: 768px) { .calc-grid { grid-template-columns: 1fr; } .navbar { flex-direction: column; gap: 15px; } }
+        
+        .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         /* --- INPUTS --- */
         .input-group { margin-bottom: 20px; }
@@ -130,7 +131,6 @@
         .btn-action-light:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); color: #1e3a8a; }
 
         /* --- SEO CONTENT & ADS --- */
-        /* Fixed ad banner minimum height to prevent Core Web Vitals CLS issues */
         .ad-banner-placeholder { width: 100%; max-width: 728px; height: 90px; min-height: 90px; margin: 40px auto; background-color: #eaeaea; display: flex; justify-content: center; align-items: center; color: #999; font-size: 0.8rem; border: 1px dashed #ccc; }
         
         .seo-content { padding: 50px 20px; background: var(--white); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-top: -30px; position: relative; z-index: 10; }
@@ -159,6 +159,19 @@
         .modal-close:hover { color: #000; }
         .modal-body h2 { color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.5rem; }
         .modal-body p { margin-bottom: 15px; font-size: 0.95rem; color: #444; }
+
+        /* --- MOBILE RESPONSIVENESS FIXES --- */
+        @media (max-width: 768px) { 
+            .calc-grid { grid-template-columns: 1fr; gap: 20px; } 
+            .navbar { flex-direction: column; gap: 15px; padding: 15px 20px; text-align: center; } 
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .hero-section { padding: 30px 0; }
+            .glass-panel { padding: 20px 15px; } /* Reduced padding for more horizontal room */
+            .calculator-header h1 { font-size: 1.8rem; }
+            .two-col-grid { grid-template-columns: 1fr; } /* Stack internal inputs */
+            .results-grid-internal { grid-template-columns: 1fr; } /* Stack results on small screens */
+            .modal-content { padding: 20px; }
+        }
     </style>
 
     <script type="application/ld+json">
@@ -223,7 +236,7 @@
                             </select>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="two-col-grid">
                             <div class="input-group">
                                 <label for="ac-ton">1. Capacity (Tonnage)</label>
                                 <select id="ac-ton" aria-label="Select AC Capacity Tonnage">
@@ -243,7 +256,7 @@
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="two-col-grid">
                             <div class="input-group">
                                 <label for="ac-tech">3. Technology</label>
                                 <select id="ac-tech" aria-label="Select AC Technology">
